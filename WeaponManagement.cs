@@ -3,24 +3,53 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class WeaponManagement : MonoBehaviour
-{
+{//this script can be attached to any empty game object. its job is to handle player input for using weapons, and collecting ammo
     //so NPC manager can call bots when player fires
+
+    //this is for managing ammunition 
+    public float activeammo;
+    public float activemagazine;
+    [SerializeField] HUD hud;
+    [SerializeField] MovementManager move;
+
+    //
     public GameObject NPCmanager;
     public float NineMillimeterRounds;
+    public float ThreeOhEightAmmo;
 
     public bool HandsEquipped;
+
+    
+
+    public bool KnifeEquipped;
+    public bool knifehave;
+    public GameObject KnifeBody;
+    public float knifetimer;
+    public float KnifeDamage;
+    public float KnifeWeaponRange;
+    Animator KN;
+
+    public float hands;
+
     public bool VectorEquipped;
     public bool VectorHave;
-    public float hands;
-    public GameObject bullet1;
-
     public GameObject Vector;
     public GameObject Vectorbody;
     public float Vectormagazine;
     public float vectorweaponrange;
     public Transform VectorMuzzle;
     public float vectordamage;
-    public float Vectortimer;
+    private float Vectortimer;
+
+    public bool HuntingRifleHave;
+    public bool HuntingRifleEquipped;
+    public GameObject HuntingRifle;
+    public GameObject HuntingRifleBody;
+    public float HuntingRifleMagazine;
+    public float HuntingRifleRange;
+    public Transform HuntingRifleMuzzle;
+    public float HuntingRifleDamage;
+    public float HuntingRifleTimer;
 
     
     public GameObject Weaponry;
@@ -36,6 +65,8 @@ public class WeaponManagement : MonoBehaviour
     public Camera cam;
 
     public GameObject hitmarker1;
+    public bool changing;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -44,16 +75,30 @@ public class WeaponManagement : MonoBehaviour
         VectorHave = false;
         hands = 0;
         Vectortimer = 4;
+        changing = false;
+        knifehave = true;
+        HandsEquipped = true;
+        KN = KnifeBody.GetComponent<Animator>();
+        knifetimer = 4;
+        HuntingRifleTimer = 10;
     }
 
     // Update is called once per frame
     void Update()
     {
         //gets button press
-
+        if (Input.GetMouseButtonDown(2))
+        {
+            changing = false;
+            ChangeWeapons();
+        }
+        if (Input.GetMouseButton(0))
+        {
+            CheckWeapons(); //rapid fire
+        }
         if (Input.GetMouseButtonDown(0))
         {
-            CheckWeapons();
+            CheckWeapons2(); //single fire
         }
         else if (Input.GetMouseButtonUp(0))
         {
@@ -67,16 +112,82 @@ public class WeaponManagement : MonoBehaviour
         {
             ReleaseAim();
         }
-
-        if (Input.GetMouseButton(0))
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            CheckWeapons();
+            Reload();
         }
 
         
+
+        
     }
-    //checks to see equipped weapon for firing, ADS, draw, etc
-    public void CheckWeapons()
+    public void SingleFireTimer()
+    {
+        if (KnifeEquipped == true)
+        {
+            knifetimer -= .25f;
+        }
+        if (HuntingRifleEquipped == true)
+        {
+            HuntingRifleTimer -= 1;
+        }
+    }
+    //for changing weapons on the fly
+    public void ChangeWeapons()
+    {
+        if (changing == false)
+        {
+            if (HandsEquipped == true)
+            {
+                if (knifehave == true)
+                {
+                    EquipKnife();
+                    changing = true;
+                }
+                else if (VectorHave)
+                {
+                    EquipVector();
+                    changing = true;
+                }
+                else if (HuntingRifleHave)
+                {
+                    EquipHuntingRifle();
+                    changing = true;
+                }
+            }
+            else if (KnifeEquipped == true)
+            {
+                if (VectorHave == true)
+                {
+                    EquipVector();
+                    changing = true;
+                }
+                else if (HuntingRifleHave)
+                {
+                    EquipHuntingRifle();
+                    changing = true;
+                }
+                else EquipHands();
+                changing = true;
+            }
+            else if (VectorEquipped == true)
+            {
+                if (HuntingRifleHave)
+                {
+                    EquipHuntingRifle();
+                    changing = true;
+                }
+                else EquipHands();
+                changing = true;
+            }else if (HuntingRifleEquipped == true)
+            {
+                EquipHands();
+                changing = true;
+            }
+        }
+    }
+    //checks to see which equipped weapon for firing, ADS, draw, etc
+    public void CheckWeapons() //called on click left button
     {
         if (HandsEquipped == true)
         {
@@ -86,8 +197,20 @@ public class WeaponManagement : MonoBehaviour
         {
             FireVectorshit();
         }
+        
     }
-    public void ReleaseWeapons()
+    public void CheckWeapons2()
+    {
+        if (KnifeEquipped == true)
+        {
+            FireKnife();
+        }
+        if (HuntingRifleEquipped == true)
+        {
+            FireRifle();
+        }
+    }
+    public void ReleaseWeapons() //called on release left button
     {
         if (HandsEquipped == true)
         {
@@ -97,17 +220,21 @@ public class WeaponManagement : MonoBehaviour
         {
             //ReleaseVector();
         }
+        if (KnifeEquipped == true)
+        {
+            ReleaseKnife();
+        }
 
-        
+
     }
-    public void Weaponwalk()
+    public void Weaponwalk() //called when walking
     {
         if (VectorEquipped == true)
         {
             Vectorwalk();
         }
     }
-    public void Weaponstop()
+    public void Weaponstop() //called when movement stops
     {
         if (VectorEquipped == true)
         {
@@ -116,7 +243,7 @@ public class WeaponManagement : MonoBehaviour
     }
 
     //aiming down sight 
-    public void CheckAim()
+    public void CheckAim() //callled on click right button 
     {
         if (VectorEquipped == true)
         {
@@ -125,7 +252,7 @@ public class WeaponManagement : MonoBehaviour
         }
         hitmarker1.SetActive(false);
     }
-    public void ReleaseAim()
+    public void ReleaseAim() //called on release right button
     {
         if (VectorEquipped == true)
         {
@@ -133,10 +260,70 @@ public class WeaponManagement : MonoBehaviour
         }
         hitmarker1.SetActive(true);
     }
+    
+    //deals with knives
+    public void EquipKnife()
+    {
+        KnifeEquipped = true;
+        VectorEquipped = false;
+        HandsEquipped = false;
+        Weaponry.GetComponent<weaponry>().KnifeEquip();
+        HuntingRifleEquipped = false;
+    }
+  
+    
+    public void FireKnife()
+    {
+        if (knifetimer < 2.5f)
+        {
+            var fire = 0;
+            move.knifejump();
+            cam.transform.rotation *= Quaternion.Euler(.4f, 0, 0.0f);
+            //Weaponry.GetComponent<weaponry>().KnifeStab();
+            //KnifeBody.GetComponent<Animator>().SetTrigger("stab");
+            //stores location of raycast hit
+            RaycastHit hit;
+            //makes raycast avoid game-layer with player and ui
+            int layerMask = (1 << 8) | (1 << 9);
+            layerMask = ~layerMask;
+            //casts ray
+            if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, KnifeWeaponRange, layerMask))
+            {
+                //makes an impact particle effect
+
+
+                HitBox target = hit.transform.GetComponent<HitBox>();         // this checks to see if object hit has a certain script
+                if (target != null)
+                {
+                    if (fire == 0)
+                    {
+                        KN.SetTrigger("GrabStab");
+                        //target.HitByProjectile(KnifeDamage);
+                        GameObject blik = Instantiate(blood, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
+                        blik.transform.SetParent(target.transform);
+                        target.KnifeHit(KnifeDamage);
+                        fire = 1;
+                    }
+
+                }
+            }
+            else KN.SetTrigger("stab");
+            knifetimer = 2;
+        }
+
+    }
+    public void ReleaseKnife()
+    {
+        Weaponry.GetComponent<weaponry>().KnifeRelease();
+    }
     //deals with hands
     public void EquipHands()
     {
         HandsEquipped = true;
+        VectorEquipped = false;
+        KnifeEquipped = false;
+        Weaponry.GetComponent<weaponry>().EquipHands();
+        HuntingRifleEquipped = false;
     }
                      //attacks with hands
     public void FireHands()
@@ -165,15 +352,89 @@ public class WeaponManagement : MonoBehaviour
             hands = 0;
         }
     }
+    //deals with hunting rifle
+    public void GrabHuntingRifle()
+    {
+        HuntingRifleHave = true;
+    }
+    public void EquipHuntingRifle()
+    {
+        HuntingRifleEquipped = true;
+        HandsEquipped = false;
+        KnifeEquipped = false;
+        VectorEquipped = false;
+        Weaponry.GetComponent<weaponry>().EquipRifle();
+        activeammo = ThreeOhEightAmmo;
+        activemagazine = HuntingRifleMagazine;
+        hud.AmmoUpdate();
+    }
+    public void FireRifle()
+    {
+        if (HuntingRifleTimer < 1)
+        {
+            if (HuntingRifleMagazine > 0)
+            {
+
+                NPCmanager.GetComponent<NpcManagement>().JustFired(); //lets NPCs know you fired, so they can look for you 
+                                                                      //HuntingRifle.GetComponent<Animator>().SetTrigger("Fire");  //plays a firing animation
+                Instantiate(muzzleflash, HuntingRifleMuzzle.position, HuntingRifleMuzzle.rotation);  //muzzleflash
+                Instantiate(smoke, HuntingRifleMuzzle.position, HuntingRifleMuzzle.rotation);  //gunsmoke
+
+                //stores location of raycast hit
+                RaycastHit hit;
+                //makes raycast avoid game-layer with player and ui
+
+                int layerMask = (1 << 8) | (1 << 9);
+                layerMask = ~layerMask;
+                //casts ray
+                if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, HuntingRifleRange, layerMask))
+                {
+                    //makes an impact particle effect
+
+
+                    HitBox target = hit.transform.GetComponent<HitBox>();         // this checks to see if object hit has a certain script
+                    if (target != null)
+                    {
+                        target.HitByProjectile(HuntingRifleDamage);
+                        GameObject blik = Instantiate(blood, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
+                        blik.transform.SetParent(target.transform);
+                        GameObject smokes = Instantiate(sparks, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
+                        smokes.transform.SetParent(target.transform);
+                    }
+                    else Instantiate(sparks, hit.point, Quaternion.LookRotation(hit.normal));
+                }
+
+
+
+                cam.transform.rotation *= Quaternion.Euler(-.1f, 0, 0.0f);
+
+                HuntingRifleMagazine -= 1;
+                activemagazine = HuntingRifleMagazine;
+
+                hud.AmmoUpdate();
+                HuntingRifleTimer = 4;
+            }
+        }
+    }
+    
     //deals with Kriss Vector SMG/Carbine
+    public void GrabVector()
+    {
+        VectorHave = true;
+    }
     public void EquipVector()
     {
         VectorEquipped = true;
         HandsEquipped = false;
+        HuntingRifleEquipped = false;
+        KnifeEquipped = false;
         VectorHave = true;
         Weaponry.GetComponent<weaponry>().HoldVector();
+        activeammo = NineMillimeterRounds;
+        activemagazine = Vectormagazine;
+        hud.AmmoUpdate();
     }
-    public void FireVectorshit()
+    public void FireVectorshit() //gets called when holding left button and manages rate of fire 
     {
         Vectortimer -= .5f;
         if (Vectortimer < 2.5f)
@@ -186,14 +447,15 @@ public class WeaponManagement : MonoBehaviour
     {
         if (Vectormagazine > 0)
         {
-            NPCmanager.GetComponent<NpcManagement>().JustFired();
-            Vector.GetComponent<Animator>().SetTrigger("Fire");
-            Instantiate(muzzleflash, VectorMuzzle.position, VectorMuzzle.rotation);
-            Instantiate(smoke, VectorMuzzle.position, VectorMuzzle.rotation);
+
+            NPCmanager.GetComponent<NpcManagement>().JustFired(); //lets NPCs know you fired, so they can look for you 
+            Vector.GetComponent<Animator>().SetTrigger("Fire");  //plays a firing animation
+            Instantiate(muzzleflash, VectorMuzzle.position, VectorMuzzle.rotation);  //muzzleflash
+            Instantiate(smoke, VectorMuzzle.position, VectorMuzzle.rotation);  //gunsmoke
 
             //stores location of raycast hit
             RaycastHit hit;
-            //makes raycast avoid layer with player and ui
+            //makes raycast avoid game-layer with player and ui
             
             int layerMask = (1 << 8) | (1<<9);
             layerMask = ~layerMask;
@@ -203,7 +465,7 @@ public class WeaponManagement : MonoBehaviour
                 //makes an impact particle effect
                 
 
-                HitBox target = hit.transform.GetComponent<HitBox>();         // this checks to see if object hit has a certain script, which is why all enemy scripts will be run on one script with a float that dictated which enemy type they are
+                HitBox target = hit.transform.GetComponent<HitBox>();         // this checks to see if object hit has a certain script
                 if (target != null)
                 {
                     target.HitByProjectile(vectordamage);
@@ -220,6 +482,9 @@ public class WeaponManagement : MonoBehaviour
             cam.transform.rotation *= Quaternion.Euler(-.1f, 0, 0.0f);
             
             Vectormagazine -= 1;
+            activemagazine=Vectormagazine;
+
+            hud.AmmoUpdate();
         }
     }
     public void Vectorwalk()
@@ -233,5 +498,78 @@ public class WeaponManagement : MonoBehaviour
     public void Addninemilammo(float ammo)
     {
         NineMillimeterRounds += ammo;
+        hud.AmmoUpdate();
+    }
+    public void AddThreeOhEightAmmo(float ammo)
+    {
+        ThreeOhEightAmmo += ammo;
+        hud.AmmoUpdate();
+    }
+    public void Reload()
+    {
+        if (VectorEquipped == true)
+        {
+            VectorReload();
+        }
+        else if (HuntingRifleEquipped == true)
+        {
+            HuntingRifleReload();
+        }
+    }
+    public void VectorReload()
+    {
+        if (NineMillimeterRounds > 0)
+        {
+            if (Vectormagazine < 15)
+            {
+                Vector.GetComponent<Animator>().SetTrigger("Reload");
+                var f = NineMillimeterRounds + Vectormagazine;
+                if (f > 15)
+                {
+                    activemagazine = 15;
+                    activeammo = f - 15;
+                    Vectormagazine = activemagazine;
+                    NineMillimeterRounds = activeammo; 
+                    Vectortimer = 8;
+                }
+                else if (f <= 15)
+                {
+                    activemagazine = f;
+                    activeammo = 0;
+                    Vectormagazine = activemagazine;
+                    NineMillimeterRounds = activeammo;
+                    Vectortimer = 8;
+                }
+                hud.AmmoUpdate();
+            }
+        }
+    }
+    public void HuntingRifleReload()
+    {
+        if (ThreeOhEightAmmo > 0)
+        {
+            if (HuntingRifleMagazine < 5)
+            {
+                //HuntingRifle.GetComponent<Animator>().SetTrigger("Reload");
+                var f = ThreeOhEightAmmo + HuntingRifleMagazine;
+                if (f > 5)
+                {
+                    activemagazine = 5;
+                    activeammo = f - 5;
+                    HuntingRifleMagazine = activemagazine;
+                    ThreeOhEightAmmo = activeammo;
+                    HuntingRifleTimer = 4;
+                }
+                else if (f <= 5)
+                {
+                    activemagazine = f;
+                    activeammo = 0;
+                    HuntingRifleMagazine = activemagazine;
+                    ThreeOhEightAmmo = activeammo;
+                    HuntingRifleTimer = 4;
+                }
+                hud.AmmoUpdate();
+            }
+        }
     }
 }

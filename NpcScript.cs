@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class NpcScript : MonoBehaviour
 {
+    public float dummyweapontimer;
+    public GameObject dummyweapon;
+    public GameObject actualweapon;
+    public bool dummyweaponadded;
+    [SerializeField] MovementManager movementManager;
     public GameObject playerhud;
     public float damagetoplayer;
     //for detecting player shot sound
@@ -13,6 +18,8 @@ public class NpcScript : MonoBehaviour
     public float xyzdif;
     public float shotdetectiontimer;
     public float shotdetectiontimernew;
+
+    public float punchclock;
 
     
     public bool unselected;
@@ -26,12 +33,15 @@ public class NpcScript : MonoBehaviour
 
 
     public Transform playercenter;
+    public Transform playercenter2;
     public GameObject HitBoxManager;
     //Things are gonna be set in the inspector
     //general use NPC script
     public float health;
     public float sightrange;
     public Transform player;
+    public Transform TheStabSpace;
+    
     public bool isalert;
 
     //for enemies hearing shots
@@ -114,14 +124,19 @@ public class NpcScript : MonoBehaviour
     {
         
         isalert = false;
-        
+        isdead = false;
+        ishurt = false;
         rb = GetComponent<Rigidbody>();
         anim = npcmaster.GetComponent<Animator>();
         NewAction();
         NPCROTATOR.SetActive(false);
         unselected = true;
-        
-        
+        punchclock = 3;
+        dummyweapontimer = 6;
+        dummyweapon.SetActive(false);
+        dummyweaponadded = false;
+
+
     }
 
     // Update is called once per frame
@@ -146,18 +161,33 @@ public class NpcScript : MonoBehaviour
             anim.SetBool("Death", true);
             NPCROTATOR.SetActive(false);
             isdead = true;
-        
-
-        
-        
+       
     }
     //new actions for npcs
     public void Looking()
     {
-        // NewFacingAngle = (Random.Range(-60, 60));
-        //transform.RotateAround(transform.position, transform.up, NewFacingAngle);
-        NPCROTATOR.SetActive(true);
-        anim.SetTrigger("LookAround");
+        if (isalert == false)
+        {
+            anim.SetTrigger("Aiming");
+            xyzdif = Vector3.Distance(NPC.transform.position, player.transform.position);
+            if (xyzdif < 12)
+            {
+                if (xyzdif > 12)
+                {
+                    transform.LookAt(playercenter);
+                }
+            }
+            else if (xyzdif > 12)
+            {
+                NPCROTATOR.SetActive(true);
+                anim.SetTrigger("LookAround");
+            }
+            else if (xyzdif < -12)
+            {
+                NPCROTATOR.SetActive(true);
+                anim.SetTrigger("LookAround");
+            }
+        }
     }
     public void Walking()
     {
@@ -213,38 +243,41 @@ public class NpcScript : MonoBehaviour
     //movement and correspon
     public void Movement()
     {
-        if (isalert == false) //only works if not alert and aiming
+        if (isdead == false)
         {
-
-            if (ishurt == false)
+            if (isalert == false) //only works if not alert and aiming
             {
-                if (NewActionNumber == 0)   //walking
-                {
-                    Walking();
 
-                }
-                if (NewActionNumber == 1)   //squatting
+                if (ishurt == false)
                 {
-                    Squatting();
-                }
-                if (NewActionNumber == 2)   //turning when not under fire
-                {                    
+                    if (NewActionNumber == 0)   //walking
+                    {
+                        Walking();
+
+                    }
+                    if (NewActionNumber == 1)   //squatting
+                    {
+                        Squatting();
+                    }
+                    if (NewActionNumber == 2)   //turning when not under fire
+                    {
                         if (Turning == false)
                         {
                             Turningz();
-                        }                                            
-                }
-                if (NewActionNumber == 3)   // idling or standing about 
-                {
-                    Idling();
+                        }
+                    }
+                    if (NewActionNumber == 3)   // idling or standing about 
+                    {
+                        Idling();
 
+                    }
                 }
-            }
-            if (ishurt == true)  //for when it hears a shot
-            {
-                if (isalert == false)
+                if (ishurt == true)  //for when it hears a shot
                 {
-                    Looking();
+                    if (isalert == false)
+                    {
+                        Looking();
+                    }
                 }
             }
         }
@@ -322,7 +355,16 @@ public class NpcScript : MonoBehaviour
             }
         }
     }
-    public void LineOfSight() //how the enemy spots the player
+    public void LineOfSight()
+    {
+        
+        if (isdead == false)
+        {
+            LineOfSight2();
+        }
+        
+    }
+    public void LineOfSight2() //electric boogaloo //how the enemy spots the player
     {
         if (ishurt == false)
         {
@@ -330,6 +372,7 @@ public class NpcScript : MonoBehaviour
             float angle = Vector3.Angle(targetDir, transform.forward);
             if (angle < 50) //if player is within peripheral view
             {
+                NPCROTATOR.SetActive(false);
                 attentionmeter -= attentionmeterdecrease;//decrease the time until enemy registers the player
                 if (attentionmeter < 8) //if it has been a sufficient amount of time
                 {
@@ -351,9 +394,10 @@ public class NpcScript : MonoBehaviour
                     layerMask = ~layerMask; //inverts raycast so raycast avoids these layers 
                     if (Physics.Raycast(transform.position, transform.forward, out hit, sightrange, layerMask)) //sends a ray from the enemys head 
                     {
-                        Rotator target = hit.transform.GetComponent<Rotator>();
+                        playerhitbox target = hit.transform.GetComponent<playerhitbox>();
                         if (target != null) //if the ray hits the player
                         {
+                            Punch();
                             attentionmeter -= attentionmeterdecreasespotted;  //more time to register 
                             if (attentionmeter < 1)  //sufficent passage of time
                             {
@@ -374,6 +418,7 @@ public class NpcScript : MonoBehaviour
         }
         if (ishurt == true)
         {
+            
             Vector3 targetDir = player.position - enemyhead.transform.position; //angle of peripheral vision with enemys head as one line of the angle
             float angle = Vector3.Angle(targetDir, transform.forward);
             if (angle < 20) //if player is within peripheral view
@@ -404,9 +449,10 @@ public class NpcScript : MonoBehaviour
                     layerMask = ~layerMask; //inverts raycast so raycast avoids these layers 
                     if (Physics.Raycast(transform.position, transform.forward, out hit, sightrange, layerMask)) //sends a ray from the enemys head 
                     {
-                        Rotator target = hit.transform.GetComponent<Rotator>();
+                        playerhitbox target = hit.transform.GetComponent<playerhitbox>();
                         if (target != null) //if the ray hits the player
                         {
+                            Punch();
                             attentionmeter -= attentionmeterdecreasespotted;  //more time to register 
                             if (attentionmeter < 1)  //sufficent passage of time
                             {
@@ -435,6 +481,21 @@ public class NpcScript : MonoBehaviour
             Movement();
             Actions();
         }
+        if (isdead == true)
+        {
+            if (dummyweaponadded == false)
+            {
+
+                dummyweapontimer -= 1;
+                if (dummyweapontimer < 2)
+                {
+                    actualweapon.SetActive(false);
+                    dummyweapon.SetActive(true);
+                    dummyweaponadded = true;
+                }
+            }
+
+        }
         HitBoxManager.GetComponent<HitBoxController>().UpdateBoxes();
     }
 
@@ -449,12 +510,10 @@ public class NpcScript : MonoBehaviour
     }
     public void ShotsFired() //turns npc to player when within range and player shoots
     {
+        Looking();
         if (ishurt == true)
         {
-            x = player.transform.position.x - transform.position.x;
-            y = player.transform.position.y - transform.position.y;
-            z = player.transform.position.z - transform.position.z;
-            xyzdif = x + y + z;
+            xyzdif = Vector3.Distance(NPC.transform.position, player.transform.position);
             if (xyzdif < 90)
             {
                 if (xyzdif > -90)
@@ -467,36 +526,50 @@ public class NpcScript : MonoBehaviour
         {
             if (isalert == false)
             {
-                transform.LookAt(player);
+               // transform.LookAt(playercenter);
                 isalert = true;
             }
         }
     }
     public void Located()
     {
-        x = player.transform.position.x - transform.position.x;
-        y = player.transform.position.y - transform.position.y;
-        z = player.transform.position.z - transform.position.z;
-        xyzdif = x + y + z;
-        if (xyzdif < 20)
+        if (isdead == false)
         {
-            if (xyzdif > -20)
-            {
-                enemyhearing();
-                if (Sneakmeter < 26)
-                {
-                    
-                    ishurt = true;
-                }
-                if (Sneakmeter < 2)
-                {
-                    transform.LookAt(player);
-                }
-            }
-            else enemycalms();
+            Located2();
         }
     }
-    public void enemyhearing()
+    public void Located2()
+    {
+        if (isdead == false)
+        {
+            xyzdif = Vector3.Distance(NPC.transform.position, player.transform.position);
+            if (xyzdif < 20)
+            {
+                if (xyzdif > -20)
+                {
+                    enemyhearing1();
+                    if (Sneakmeter < 26)
+                    {
+
+                        Looking();
+                    }
+                    if (Sneakmeter < 13)
+                    {
+                        transform.LookAt(playercenter);
+                    }
+                    if (xyzdif < 10)
+                    {
+                        if (xyzdif > -10)
+                        {
+                            enemyhearing2();
+                        }
+                    }
+                        }
+                else enemycalms();
+            }
+        }
+    }
+    public void enemyhearing1()
     {
         if (Input.GetKey(KeyCode.W))
         {
@@ -515,6 +588,26 @@ public class NpcScript : MonoBehaviour
             Sneakmeter -= Sneakmeterdecrease;
         }
         
+    }
+    public void enemyhearing2()
+    {
+        if (Input.GetKey(KeyCode.W))
+        {
+            Sneakmeter -= Sneakmeterdecrease *3;
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            Sneakmeter -= Sneakmeterdecrease * 3;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            Sneakmeter -= Sneakmeterdecrease * 3;
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            Sneakmeter -= Sneakmeterdecrease * 3;
+        }
+
     }
     public void enemycalms()
     {
@@ -549,20 +642,21 @@ public class NpcScript : MonoBehaviour
                     NPCROTATOR.SetActive(true);
                     Sneakmeter = 0;
                     ishurt = true;
-                    //anim.SetTrigger("Shuffle");
+                    anim.SetTrigger("Aiming");
                 }
             }
         }
     }
     public void TakeShot()
     {
+        anim.SetTrigger("Aiming");
         anim.SetTrigger("Fire");
         RaycastHit hit;
         int layerMask = 1 << 9;
         layerMask = ~layerMask;
         if (Physics.Raycast(transform.position, transform.forward, out hit, sightrange, layerMask))
         {
-            Rotator target = hit.transform.GetComponent<Rotator>();
+            playerhitbox target = hit.transform.GetComponent<playerhitbox>();
             if (target != null)
             {
                 GameObject blik = Instantiate(blood, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
@@ -573,6 +667,73 @@ public class NpcScript : MonoBehaviour
         Instantiate(GunSmoke, GunMuzzle.position, GunMuzzle.rotation);
         Instantiate(MuzzleFlash, GunMuzzle.position, GunMuzzle.rotation);
         RateOfFire = NewRateOfFire;
+        isalert = true;
+        ishurt = true;
     }
+    public void HitByKnife(float damage)
+    {
+
+        health -= damage;
+        CheckHealth();
+        
+    }
+    public void CheckHealth()
+    {
+        if (health <= 0)
+        {
+            isdead = true;
+            rb.Sleep();
+            rb.WakeUp();
+            Die();
+        }
+        else if (health > 0)
+        {
+            StillAlive();
+        }
+    }
+    public void StillAlive()
+    {
+        ishurt = true;
+        attentionmeter = 0;
+        RateOfFire = 0;
+        //transform.LookAt(playercenter);
+        LineOfSight();
+
+    }
+    public void TheyCrouch()
+    {
+        Sneakmeterdecrease = Sneakmeterdecrease / 5;
+    }
+    public void TheyStand()
+    {
+        Sneakmeterdecrease = Sneakmeterdecrease * 2;
+    }
+    public void GetStabbed()
+    {
+        Vector3 TheStabbingFloor = new Vector3 (TheStabSpace.position.x, TheStabSpace.position.y, TheStabSpace.position.z);
+        NPC.transform.position = TheStabbingFloor;
+        
+        
+    }
+    public void Punch()
+    {
+         xyzdif = Vector3.Distance(NPC.transform.position, player.transform.position);
+        if (xyzdif <6)
+        {
+            if (xyzdif > -6)
+            {
+                punchclock -= 3;
+                
+                    anim.SetTrigger("punch");
+                if (punchclock == 0)
+                {
+                    movementManager.GetPunched();
+                    punchclock = 3;
+                }
+
+            }
+        }
+    }
+    
 
 }

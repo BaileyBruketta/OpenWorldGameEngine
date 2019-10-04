@@ -20,6 +20,8 @@ public class EnemyRotationScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        randominteger = Random.Range(0, 6);
+        excel = rotationspeedfortyplus[randominteger];
         npc.transform.Rotate(npc.up, Time.deltaTime * excel);
        
     }

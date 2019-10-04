@@ -8,9 +8,9 @@ public class NPCRenderCull : MonoBehaviour
     public float Timer1;
     
     public float Timerthreshold1;
-    public GameObject NPC1;
-    public GameObject NPC2;
-    public GameObject NPC3;
+    public GameObject GenericNPC1;
+    public GameObject GenericNPC2;
+    public GameObject GenericNPC3;
 
     NPClocationGrabforRender NPCie1;
     NPClocationGrabforRender NPCie2;
@@ -19,9 +19,9 @@ public class NPCRenderCull : MonoBehaviour
     void Start()
     {
         Timer1 = TimerStart1;
-        NPCie1 = NPC1.GetComponent<NPClocationGrabforRender>();
-        NPCie2 = NPC2.GetComponent<NPClocationGrabforRender>();
-        NPCie3 = NPC3.GetComponent<NPClocationGrabforRender>();
+        NPCie1 = GenericNPC1.GetComponent<NPClocationGrabforRender>();
+        NPCie2 = GenericNPC2.GetComponent<NPClocationGrabforRender>();
+        NPCie3 = GenericNPC3.GetComponent<NPClocationGrabforRender>();
     }
 
     public void UpdateCulling() //called from any script that has a timer;
@@ -45,6 +45,7 @@ public class NPCRenderCull : MonoBehaviour
         {
             NPCie3.UpdateLocationandRender();
         }
+        Timer1 = 6;
     }
     
 

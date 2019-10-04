@@ -5,8 +5,10 @@ using UnityEngine;
 public class GrabInputScript : MonoBehaviour
 {
     //This script exists to watch for when the player presses E, and then call to all items that can be picked up to see if the player is within range 
-    public GameObject Vectro;
+    
     public bool Vectrino;
+    public bool Apple1;
+    public GameObject[] Items;
     
     void Start()
     {
@@ -26,8 +28,14 @@ public class GrabInputScript : MonoBehaviour
     {
         if (Vectrino == false)
         {
-            Vectro.GetComponent<PickUpVector>().Grab();
+            Items[0].GetComponent<PickUpVector>().Grab();
         }
+        if (Apple1 == false)
+        {            
+            Items[1].GetComponent<PickUpVector>().Grab();
+            Apple1 = true;
+        }
+
     }
 
 
