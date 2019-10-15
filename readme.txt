@@ -34,6 +34,14 @@ may be called by another script using timers to avoid using Update() function.
 
 an empty object with animalmanager script, and child objects that are animals with animalscript. similar to NPC setup.
 
+each npc has - an empty child object with a hitbox manager script. this object has child objects with hitbox scripts. 
+
+hitboxmanager refers to location of npc body parts and pushes hitboxes to them. this is called by npcscript, which is called by npcmanager. 
+
+each npc has an enemyrotation script. this spins the npc in a staggered yet fluid manner when alert. it casts ray before spins so that the npc does not overspin past the player. it stays off until enemy is alert or when enemy utilizes turning action. 
+
+npcs have a spine object that moves to adjust line of sight to player height. enemy weapons have an empoty object that links to npcscript as a muzzle, which moves to aim to the player.
+
 
 
 
