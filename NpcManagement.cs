@@ -5,41 +5,22 @@ using UnityEngine;
 public class NpcManagement : MonoBehaviour
 {
     public GameObject hud;
-    public GameObject NPC1;
-    NpcScript npce1;
-    public GameObject NPC2;
-    NpcScript npce2;
-    public GameObject NPC3;
-    NpcScript npce3;
-    public GameObject NPC4;
-    NpcScript npce4;
-    
     public float timer;
     public float timer2;
-    public GameObject terrainmasterscript;
-    public GameObject NPCMasterCulling;
-    NPCRenderCull rendie;
     public GameObject movementmanager;
     [SerializeField] WeaponManagement weaponManagement;
     [SerializeField] HUD hudie;
-    
-
-   
-
+    public GameObject[] NPCs;
+    public Transform[] NPClocation;
+    public Vector3[] NPCcoordinates;
+    public float[] xyzdif;
+    public Transform player;
+    public float threshold;
     // Start is called before the first frame update
     void Start()
     {
         timer = 3;
-        rendie = NPCMasterCulling.GetComponent<NPCRenderCull>();
         timer2 = 5;
-        npce1 = NPC1.GetComponent<NpcScript>();
-        npce2 = NPC2.GetComponent<NpcScript>();
-        npce3 = NPC3.GetComponent<NpcScript>();
-        npce4 = NPC4.GetComponent<NpcScript>();
-        
-
-
-
     }
     // Update is called once per frame
     void Update()
@@ -48,7 +29,7 @@ public class NpcManagement : MonoBehaviour
         movementmanager.GetComponent<MovementManager>().Update2();
         if (timer > 0)
         {
-            timer -= .25f;
+            timer -= .1f;
             if (timer < 2.1f)
             {
                 UpdateNpcs();
@@ -59,82 +40,65 @@ public class NpcManagement : MonoBehaviour
         }
     }
     public void UpdateNpcs()
-    {        
-        UpdateNPCs2();
+    {
+        for (int i = 0; i < NPCs.Length; i++)
+        {
+            NPCs[i].GetComponent<NpcScript>().GetTheUpdate();
+        }
     }
     public void UpdateNPCs2()
     {
-        timer2 -= 1f;
-        if (timer2 == 4)
+        for (int i = 0; i < NPCs.Length; i++)
         {
-            npce4.GetTheUpdate();
-            
-            Debug.Log("4");
-            terrainmasterscript.GetComponent<GridWatcher>().UpdateBlocks();
-        }
-        else if (timer2 == 3)
-        {
-            npce3.GetTheUpdate();
-            Debug.Log("3");
-            terrainmasterscript.GetComponent<GridWatcher>().UpdateBlocks();
-        }
-        else if (timer2 == 2)
-        {
-            npce2.GetTheUpdate();
-            Debug.Log("2");
-            terrainmasterscript.GetComponent<GridWatcher>().UpdateBlocks();
-        }
-        else if (timer2 == 1)
-        {
-            npce1.GetTheUpdate();
-            Debug.Log("1");
-            terrainmasterscript.GetComponent<GridWatcher>().UpdateBlocks();
-        }
-        else if (timer2 == 0)
-        {
-            weaponManagement.SingleFireTimer();
-            rendie.UpdateCulling();
-            terrainmasterscript.GetComponent<GridWatcher>().UpdateBlocks();
-            hud.GetComponent<HUD>().SlowHeal();
-            
-            timer2 = 5;
+            NPCcoordinates[i] = new Vector3(NPClocation[i].position.x, NPClocation[i].position.y, NPClocation[i].position.z);
+            xyzdif[i] = Vector3.Distance(NPCcoordinates[i], player.transform.position);
+            if (xyzdif[i] > threshold)
+            {
+                NPCs[i].SetActive(false);
+            }
+            if (xyzdif[i] < threshold)
+            {
+                NPCs[i].SetActive(true);
+            }
+
+            NPCs[i].GetComponent<NpcScript>().GetTheUpdate();
         }
     }
     public void JustFired()
     {
-        npce1.DamageAlert();
-        npce2.DamageAlert();
-        npce3.DamageAlert();
-        npce4.DamageAlert();
-      
+        for (int i = 0; i < NPCs.Length; i++)
+        {
+            NPCs[i].GetComponent<NpcScript>().DamageAlert();
+        }
+
     }    
     public void WeGotemboys()                   //not fun or good looking
     {
-        npce1.Located();
-        npce2.Located();
-        npce3.Located();
-        npce4.Located();
+        for (int i = 0; i < NPCs.Length; i++)
+        {
+            NPCs[i].GetComponent<NpcScript>().Located();
+        }
     }
     public void Crouchon()
     {
-        npce1.TheyCrouch();
-        npce2.TheyCrouch();
-        npce3.TheyCrouch();
-        npce4.TheyCrouch();
+        for (int i = 0; i < NPCs.Length; i++)
+        {
+            NPCs[i].GetComponent<NpcScript>().TheyCrouch();
+        }
     }
     public void Crouchoff()
     {
-        npce1.TheyStand();
-        npce2.TheyStand();
-        npce3.TheyStand();
-        npce4.TheyStand();
+        for (int i = 0; i < NPCs.Length; i++)
+        {
+            NPCs[i].GetComponent<NpcScript>().TheyStand();
+        }
     }
     public void HearADeath(float x, float y, float z)
     {
-        npce1.DeathHeard(x,y,z);
-        npce2.DeathHeard(x, y, z);
-        npce3.DeathHeard(x, y, z);
-        npce4.DeathHeard(x, y, z);
+        for (int i = 0; i < NPCs.Length; i++)
+        {
+            NPCs[i].GetComponent<NpcScript>().DeathHeard(x,y,z);
+        }
     }
    
 }

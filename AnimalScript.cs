@@ -80,7 +80,7 @@ public class AnimalScript : MonoBehaviour
            // rb.WakeUp();
             var v = rb.velocity;
             rb.AddRelativeForce(Vector3.forward * speed);
-            rb.AddForce(transform.up * 6);
+            //rb.AddForce(transform.up * 3);
             rb.velocity = v.normalized * maxvelocity;
 
             

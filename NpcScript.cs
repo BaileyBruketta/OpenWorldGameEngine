@@ -8,8 +8,7 @@ public class NpcScript : MonoBehaviour
     public float seentimer;
     public bool seen;
     public GameObject rotationscript;
-    private readonly VectorPid angularVelocityController = new VectorPid(33.7766f, 0, 0.2553191f);
-    private readonly VectorPid headingController = new VectorPid(9.244681f, 0, 0.06382979f);
+    
 
     public float angel1;
     public float angel2;

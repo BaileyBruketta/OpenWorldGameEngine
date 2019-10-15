@@ -26,8 +26,12 @@ public class Animalmanager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        animaltimer -= 1;
-        if (animaltimer == 2)
+        timer();
+    }
+    public void timer()
+    {
+        animaltimer -= .25f;
+        if (animaltimer <=2)
         {
             checkanimals();
             rendercheck();
@@ -64,6 +68,6 @@ public class Animalmanager : MonoBehaviour
             }
             
         }
-        rendertimer = 10;
+       // rendertimer = 10;
     }
 }
