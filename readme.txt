@@ -4,16 +4,14 @@ implementation is as follows:
 
 a movementmanager script is attached to an empty object: this gets input for player movement
 
-a terrainsmanager script is attached to an empty object: this simply calls all present 16 block scripts, so that only 
-one update function occurs for all grids/blocks 
+a terrainrenderscript is attached to an empty object that contains all terrain pieces as children objects. this script gets all terrains and saves their locations as a float. every x amount of frames, it runs these floats againts player location to see if they should be active or not. the same script is used in a miniature 16 block in each individual terrain. this holds items. larger script/worldmap could just handle items on its own, but this may be cleaner for the developer and not impact performance. 
 
 a weaponmanager script is attached to an empty object, and gets inout for player weapons 
 
 an npc manager script is attached to an empty object, and calls objects with NPC scripts. in a larger map, you may utilize multiple 
 versions of this attached to terrain pieces (larger than blocks), which will deactivate based on location 
 
-each terrain has an empty child object with a sixteen block script, and this object 16 child objects that are turned on and off by 
-the sixteen block script. these child objects hold setpieces.
+
 
 an empty object named soundbar holds child objects; each child object holds a sound and a oneshot audio script (not present in this build)
 
