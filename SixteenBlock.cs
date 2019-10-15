@@ -50,6 +50,7 @@ public class SixteenBlock : MonoBehaviour
         Columntimer2 = 9;
         Columntimer3 = 9;
         Columntimer4 = 9;
+        
     }
 
     // Update is called once per frame
@@ -57,7 +58,7 @@ public class SixteenBlock : MonoBehaviour
 
     public void Updatemap()
     {
-        timer -= .5f;
+        timer -= 2f;
 
         if (timer == 18)
         {
@@ -85,7 +86,7 @@ public class SixteenBlock : MonoBehaviour
     //columns
     public void Column1()
     {
-        Columntimer1 -= .5f;
+        Columntimer1 -= 1f;
 
         if (Columntimer1 == 8)
         {

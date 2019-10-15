@@ -24,7 +24,7 @@ public class DayAndNightCycle : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentTimeOfDay = .5f;
+        currentTimeOfDay = .3f;
     }
 
     // Update is called once per frame
@@ -51,14 +51,14 @@ public class DayAndNightCycle : MonoBehaviour
         if (currentTimeOfDay < .25)
         {
             sunlight.intensity = 0;
-            moonie.intensity = .25f;
+            moonie.intensity = .1f;
             RenderSettings.skybox.SetFloat("_Exposure", 0);
         }
 
         if (currentTimeOfDay > .75)
         {
             sunlight.intensity = 0;
-            moonie.intensity = .25f;
+            moonie.intensity = .1f;
             RenderSettings.skybox.SetFloat("_Exposure", 0);
         }
 
@@ -66,7 +66,7 @@ public class DayAndNightCycle : MonoBehaviour
         {
             if (currentTimeOfDay < .75)
             {
-                sunlight.intensity = 1f;
+                sunlight.intensity = 2f;
                 moonie.intensity = 0;
                 RenderSettings.skybox.SetFloat("_Exposure", 1);
             }

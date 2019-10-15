@@ -19,6 +19,7 @@ public class WeaponManagement : MonoBehaviour
 
     public bool HandsEquipped;
 
+    public float weaponslots;
     
 
     public bool KnifeEquipped;
@@ -66,7 +67,11 @@ public class WeaponManagement : MonoBehaviour
 
     public GameObject hitmarker1;
     public bool changing;
-    
+    public float pistolfloat;
+    public float knifefloat;
+    public float submachinegunfloat;
+    public float riflefloat;
+    public float weaponequipnumber;
 
     // Start is called before the first frame update
     void Start()
@@ -76,11 +81,12 @@ public class WeaponManagement : MonoBehaviour
         hands = 0;
         Vectortimer = 4;
         changing = false;
-        knifehave = true;
+        knifehave = false;
         HandsEquipped = true;
         KN = KnifeBody.GetComponent<Animator>();
         knifetimer = 4;
         HuntingRifleTimer = 10;
+        weaponequipnumber = 0;
     }
 
     // Update is called once per frame
@@ -90,7 +96,7 @@ public class WeaponManagement : MonoBehaviour
         if (Input.GetMouseButtonDown(2))
         {
             changing = false;
-            ChangeWeapons();
+            ChangeWeapons2();
         }
         if (Input.GetMouseButton(0))
         {
@@ -133,59 +139,54 @@ public class WeaponManagement : MonoBehaviour
         }
     }
     //for changing weapons on the fly
-    public void ChangeWeapons()
+    public void ChangeWeapons2() //checks to see which weapon/weaponslot you're using 
     {
         if (changing == false)
         {
-            if (HandsEquipped == true)
+            if (weaponequipnumber == 0)
             {
-                if (knifehave == true)
-                {
-                    EquipKnife();
-                    changing = true;
-                }
-                else if (VectorHave)
-                {
-                    EquipVector();
-                    changing = true;
-                }
-                else if (HuntingRifleHave)
-                {
-                    EquipHuntingRifle();
-                    changing = true;
-                }
-            }
-            else if (KnifeEquipped == true)
-            {
-                if (VectorHave == true)
-                {
-                    EquipVector();
-                    changing = true;
-                }
-                else if (HuntingRifleHave)
-                {
-                    EquipHuntingRifle();
-                    changing = true;
-                }
-                else EquipHands();
+                EquipKnives();
                 changing = true;
-            }
-            else if (VectorEquipped == true)
+            }else if (weaponequipnumber == 1)
             {
-                if (HuntingRifleHave)
-                {
-                    EquipHuntingRifle();
-                    changing = true;
-                }
-                else EquipHands();
+                EquipRifles();
                 changing = true;
-            }else if (HuntingRifleEquipped == true)
+            }else if (weaponequipnumber == 2)
+            {
+                EquipSMGs();
+                changing = true;
+            }else if (weaponequipnumber == 3)
             {
                 EquipHands();
-                changing = true;
             }
         }
     }
+    //these all see which actual weapon is in the selected weaponslot
+    public void EquipKnives()
+    {
+        weaponequipnumber = 1;
+        if (knifehave == true)
+        {
+            EquipKnife();
+        }
+    }
+    public void EquipRifles()
+    {
+        weaponequipnumber = 2;
+        if (HuntingRifleHave == true)
+        {
+            EquipHuntingRifle();
+        }
+    }
+    public void EquipSMGs()
+    {
+        weaponequipnumber = 3;
+        if (VectorHave == true)
+        {
+            EquipVector();
+        }
+    }
+   
     //checks to see which equipped weapon for firing, ADS, draw, etc
     public void CheckWeapons() //called on click left button
     {
@@ -260,8 +261,28 @@ public class WeaponManagement : MonoBehaviour
         }
         hitmarker1.SetActive(true);
     }
-    
+
     //deals with knives
+    public void GrabTanto()
+    {
+        if (knifehave == true)
+        {
+            Tantofalse();
+        }
+        if (knifehave == false)
+        {
+            Tantotrue();
+        }
+
+    }
+    public void Tantotrue()
+    {
+        knifehave = true;
+    }
+    public void Tantofalse()
+    {
+        knifehave = false;
+    }
     public void EquipKnife()
     {
         KnifeEquipped = true;
@@ -319,6 +340,7 @@ public class WeaponManagement : MonoBehaviour
     //deals with hands
     public void EquipHands()
     {
+        weaponequipnumber = 0;
         HandsEquipped = true;
         VectorEquipped = false;
         KnifeEquipped = false;
@@ -355,7 +377,21 @@ public class WeaponManagement : MonoBehaviour
     //deals with hunting rifle
     public void GrabHuntingRifle()
     {
+        if(HuntingRifleHave == true)
+        {
+            HuntingRifleFalse();
+        }else if  (HuntingRifleHave == false)
+            {
+                HuntingRifleTrue();
+            }
+    }
+    public void HuntingRifleTrue()
+    {
         HuntingRifleHave = true;
+    }
+    public void HuntingRifleFalse()
+    {
+        HuntingRifleHave = false;
     }
     public void EquipHuntingRifle()
     {
@@ -420,7 +456,22 @@ public class WeaponManagement : MonoBehaviour
     //deals with Kriss Vector SMG/Carbine
     public void GrabVector()
     {
+
+        if (VectorHave == true)
+        {
+            Vectorfalse();
+        }else if (VectorHave == false)
+        {
+            Vectortrue();
+        }
+    }
+    public void Vectortrue()
+    {
         VectorHave = true;
+    }
+    public void Vectorfalse()
+    {
+        VectorHave = false;
     }
     public void EquipVector()
     {

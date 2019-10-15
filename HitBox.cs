@@ -20,7 +20,15 @@ public class HitBox : MonoBehaviour
     public void HitByProjectile(float damage)
     {
         damagetosend = damage * damagemultiplier;
-        NPC.GetComponent<NpcScript>().TakeDamage(damagetosend);
+        if (NPC.GetComponent<NpcScript>())
+        {
+            NPC.GetComponent<NpcScript>().TakeDamage(damagetosend);
+        }
+        if (NPC.GetComponent<AnimalScript>())
+        {
+            NPC.GetComponent<AnimalScript>().TakeDamage(damagetosend);
+        }
+        Debug.Log("damagesent");
     }
     public void KnifeHit(float damage)
     {

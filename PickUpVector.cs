@@ -50,7 +50,7 @@ public class PickUpVector : MonoBehaviour
         //number dictates what will be picked. able to be set in the inspector
         if (number == 1)  //vectro submachinegun
         {
-            WeaponManager.GetComponent<WeaponManagement>().GrabVector();
+           // WeaponManager.GetComponent<WeaponManagement>().GrabVector();
             //InputCatcher.GetComponent<GrabInputScript>().VectorGrabbed();
             WeaponManager.GetComponent<WeaponManagement>().Addninemilammo(ammo);
             inventory.AddItem(item);
@@ -61,11 +61,22 @@ public class PickUpVector : MonoBehaviour
             inventory.AddItem(item);
             Destroy(thisgun);
         }
-        if (number == 3)
+        if (number == 3) //hunting rifle
         {
-            WeaponManager.GetComponent<WeaponManagement>().GrabHuntingRifle();
+            //WeaponManager.GetComponent<WeaponManagement>().GrabHuntingRifle();
             inventory.AddItem(item);
             WeaponManager.GetComponent<WeaponManagement>().AddThreeOhEightAmmo(ammo);
+            thisgun.SetActive(false);
+        }
+        if (number == 4) //tanto
+        {
+            inventory.AddItem(item);
+            Destroy(thisgun);
+
+        }
+        if (number == 5) //meat or general
+        {
+            inventory.AddItem(item);
             thisgun.SetActive(false);
         }
     }

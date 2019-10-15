@@ -28,13 +28,25 @@ public class HUD : MonoBehaviour
     public GameObject menupane;
     public GameObject player;
 
+    public float experiencepoints;
+    public Text experiencetext;
+    public int Level;
+    public float[] experiencecap;
+
+    public float skillpoints;
+
     // Start is called before the first frame update
     void Start()
     {
+        Level = 0;
+        int l = Level + 1;
         healthdisplay.text = "HEALTH: " + health + "/" + maxhealth;
         HungerDisplay.text = "HUNGER: " + hunger + "/" + maxhunger;
         AmmoDisplay.text = "AMMO: " + magazine + "/" + ammo;
         ispaused = false;
+        experiencepoints = 0;
+        experiencetext.text = "LV" + Level + ": " + experiencepoints + "/" + experiencecap[l];
+        skillpoints = 0;
     }
 
     // Update is called once per frame
@@ -69,8 +81,11 @@ public class HUD : MonoBehaviour
     {
         if (health < maxhealth)
         {
-            health += .001f;
-            healthdisplay.text = "HEALTH: " + health + "/" + maxhealth;
+            if (hunger > 3)
+            {
+                health += .02f;
+                healthdisplay.text = "HEALTH: " + health + "/" + maxhealth;
+            }
         }
         if (hunger > 0)
         {
@@ -134,5 +149,41 @@ public class HUD : MonoBehaviour
                 ispaused = true;
             }
         
+    }
+    public void Eatapple()
+    {
+        hunger += 5;
+    }
+    public void addexperience(float exp)
+    { int x = Level + 1;
+        experiencepoints += exp;
+        experiencetext.text = "LV" + Level + ": " + experiencepoints + "/" + experiencecap[x];
+        checklevel();
+    }
+    public void updatelevel()
+    {
+        int x = Level + 1;
+        experiencetext.text = "LV" + Level + ": " + experiencepoints + "/" + experiencecap[x];
+    }
+    
+    public void checklevel()
+    {
+        int x = Level + 1;
+        
+            if (experiencepoints >= experiencecap[x])
+            {
+
+                Level2();
+            }
+        
+    }
+    public void Level2()
+    {
+        int x = Level + 1;
+        skillpoints += 1;
+        var g = experiencecap[x] - experiencepoints;
+        experiencepoints = g;
+        Level +=1;
+        updatelevel();
     }
 }

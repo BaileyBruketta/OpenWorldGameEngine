@@ -26,7 +26,7 @@ public class MovementManager : MonoBehaviour
     public Transform stabspacething;
     public Transform stabspacething2;
     public Transform stabspace;
-
+    public bool grounded;
 
     public GameObject Weaponmanj;   //for calling to weapons walk, run, or ,idle statii
     
@@ -78,7 +78,7 @@ public class MovementManager : MonoBehaviour
             {
                 iscrouching = true;
                 speed = 100;
-                
+                rb.AddRelativeForce(Vector3.up * 300);
                 col_size.height = 1.4f;
                 col_size.center = new Vector3(0, -1.260211f, 0);
                 npcManagement.Crouchon();
@@ -106,7 +106,7 @@ public class MovementManager : MonoBehaviour
 
         
 
-        if (jumptimer <1)
+        if (grounded==true)
         {
             var v = rb.velocity;
             
@@ -153,8 +153,11 @@ public class MovementManager : MonoBehaviour
                         {
                             if (jumptimer < 1)
                             {
-                                Weaponmanj.GetComponent<WeaponManagement>().Weaponstop();
-                                rb.Sleep();
+                                if (grounded == true)
+                                {
+                                    Weaponmanj.GetComponent<WeaponManagement>().Weaponstop();
+                                    rb.Sleep();
+                                }
                             }   
                         }
                     }
@@ -165,11 +168,11 @@ public class MovementManager : MonoBehaviour
     }
     public void knifejump()
     {
-        rb.Sleep();
-        a = true;
-        rb.WakeUp();
-        jumptimer = 5;
-        rb.AddRelativeForce(Vector3.forward * 1200);
+      //  rb.Sleep();
+       // a = true;
+        //rb.WakeUp();
+        //jumptimer = 5;
+        //rb.AddRelativeForce(Vector3.forward * 1200);
     }
     public void GetPunched()
     {
@@ -179,5 +182,15 @@ public class MovementManager : MonoBehaviour
         rb.WakeUp();
         jumptimer = 5;
         rb.AddRelativeForce(Vector3.forward * -2200);
+    }
+    public void antifloat()
+    {
+        grounded = false;
+        
+    }
+    public void antifloat2()
+    {
+        grounded = true;
+        
     }
 }
