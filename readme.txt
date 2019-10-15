@@ -42,6 +42,11 @@ each npc has an enemyrotation script. this spins the npc in a staggered yet flui
 
 npcs have a spine object that moves to adjust line of sight to player height. enemy weapons have an empoty object that links to npcscript as a muzzle, which moves to aim to the player.
 
+inventory works as follows: 
+empty menu object has an inventorymanager script. one child object for inventory, and one for the equipment panel. inventory panel has the invenmtory script, and equiptment panel has the equipment panel script. the inventory has a child object with a grid layout plugin (unity ui default package). the grid has child objects numbered to your liking that are empty, or have an image as a background, and then have an itemslots script attached, with references to each available game item. equipmentslots acts the same way. 
+
+quests will utilize a similar system as the inventory.
+
 
 
 
