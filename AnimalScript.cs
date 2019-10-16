@@ -55,7 +55,7 @@ public class AnimalScript : MonoBehaviour
         Debug.Log("animalupdate");
         moving();
         
-        checktimer -= .5f;
+        checktimer -= 1f;
         if(checktimer < 1){
             checkforplayer();
         }
@@ -77,7 +77,8 @@ public class AnimalScript : MonoBehaviour
                 Wander();
             }
             //rb.Sleep();
-           // rb.WakeUp();
+            // rb.WakeUp();
+            HitBoxManager.GetComponent<HitBoxController>().UpdateBoxes();
             var v = rb.velocity;
             rb.AddRelativeForce(Vector3.forward * speed);
             //rb.AddForce(transform.up * 3);

@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class WeaponManagement : MonoBehaviour
 {//this script can be attached to any empty game object. its job is to handle player input for using weapons, and collecting ammo
-    //so NPC manager can call bots when player fires
+ //so NPC manager can call bots when player fires
 
+    public GameObject scope;
+    public GameObject scopebody;
+    public Camera maincam;
     //this is for managing ammunition 
     public float activeammo;
     public float activemagazine;
@@ -92,6 +95,7 @@ public class WeaponManagement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //knifetimer -= .5f;
         //gets button press
         if (Input.GetMouseButtonDown(2))
         {
@@ -225,6 +229,7 @@ public class WeaponManagement : MonoBehaviour
         {
             ReleaseKnife();
         }
+        
 
 
     }
@@ -234,12 +239,20 @@ public class WeaponManagement : MonoBehaviour
         {
             Vectorwalk();
         }
+        if (HuntingRifleEquipped == true)
+        {
+            HuntingRiflewalk();
+        }
     }
     public void Weaponstop() //called when movement stops
     {
         if (VectorEquipped == true)
         {
             Vectorstop();
+        }
+        if (HuntingRifleEquipped == true)
+        {
+            HuntingRiflestop();
         }
     }
 
@@ -251,6 +264,14 @@ public class WeaponManagement : MonoBehaviour
             Vector.GetComponent<Animator>().SetBool("ads", true);
             
         }
+        if (HuntingRifleEquipped == true)
+        {
+            HuntingRifle.GetComponent<Animator>().SetBool("ads", true);
+            scope.SetActive(true);
+            scopebody.SetActive(false);
+            maincam.fieldOfView = 15;
+
+        }
         hitmarker1.SetActive(false);
     }
     public void ReleaseAim() //called on release right button
@@ -258,6 +279,15 @@ public class WeaponManagement : MonoBehaviour
         if (VectorEquipped == true)
         {
             Vector.GetComponent<Animator>().SetBool("ads", false);
+
+        }
+        if (HuntingRifleEquipped == true)
+        {
+            HuntingRifle.GetComponent<Animator>().SetBool("ads", false);
+            maincam.fieldOfView = 110;
+            scope.SetActive(false);
+            scopebody.SetActive(true);
+
         }
         hitmarker1.SetActive(true);
     }
@@ -375,7 +405,15 @@ public class WeaponManagement : MonoBehaviour
         }
     }
     //deals with hunting rifle
-    public void GrabHuntingRifle()
+    public void HuntingRiflewalk()
+    {
+        HuntingRifle.GetComponent<Animator>().SetBool("walk", true);
+    }
+    public void HuntingRiflestop()
+    {
+        HuntingRifle.GetComponent<Animator>().SetBool("walk", false);
+    }
+        public void GrabHuntingRifle()
     {
         if(HuntingRifleHave == true)
         {
@@ -412,7 +450,7 @@ public class WeaponManagement : MonoBehaviour
             {
 
                 NPCmanager.GetComponent<NpcManagement>().JustFired(); //lets NPCs know you fired, so they can look for you 
-                                                                      //HuntingRifle.GetComponent<Animator>().SetTrigger("Fire");  //plays a firing animation
+                HuntingRifle.GetComponent<Animator>().SetTrigger("Fire");                                               //HuntingRifle.GetComponent<Animator>().SetTrigger("Fire");  //plays a firing animation
                 Instantiate(muzzleflash, HuntingRifleMuzzle.position, HuntingRifleMuzzle.rotation);  //muzzleflash
                 Instantiate(smoke, HuntingRifleMuzzle.position, HuntingRifleMuzzle.rotation);  //gunsmoke
 
@@ -451,6 +489,7 @@ public class WeaponManagement : MonoBehaviour
                 HuntingRifleTimer = 4;
             }
         }
+        
     }
     
     //deals with Kriss Vector SMG/Carbine
@@ -601,7 +640,7 @@ public class WeaponManagement : MonoBehaviour
         {
             if (HuntingRifleMagazine < 5)
             {
-                //HuntingRifle.GetComponent<Animator>().SetTrigger("Reload");
+                HuntingRifle.GetComponent<Animator>().SetTrigger("Reload");
                 var f = ThreeOhEightAmmo + HuntingRifleMagazine;
                 if (f > 5)
                 {

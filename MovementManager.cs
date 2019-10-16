@@ -28,7 +28,10 @@ public class MovementManager : MonoBehaviour
     public Transform stabspace;
     public bool grounded;
 
-    public GameObject Weaponmanj;   //for calling to weapons walk, run, or ,idle statii
+    public GameObject Weaponmanj;
+    //for calling to weapons walk, run, or ,idle statii
+    NpcManagement manj;
+    WeaponManagement weps;
     
     void Start()
     {
@@ -36,14 +39,16 @@ public class MovementManager : MonoBehaviour
         Cursor.visible = false;
         rb = player.GetComponent<Rigidbody>();
         col_size = player.GetComponent<CapsuleCollider>();
+        manj = npcManagement.GetComponent<NpcManagement>();
+        weps = Weaponmanj.GetComponent<WeaponManagement>();
     }
 
     // Update is called once per frame
-    public void Update2()
+    public void Update()
     {
-        speed = 300;
+        speed =100;
         jumptimer -= 1;
-        maxVelocity = 2;
+        maxVelocity = 1;
         rb.WakeUp();
         //set speeds
 //        if (rb.velocity.magnitude < 5)
@@ -56,7 +61,7 @@ public class MovementManager : MonoBehaviour
         
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            speed = 700;
+            speed = 500;
         }
 
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -114,7 +119,7 @@ public class MovementManager : MonoBehaviour
             {        
                 rb.AddRelativeForce(Vector3.forward * speed);
                 w = true;
-                Weaponmanj.GetComponent<WeaponManagement>().Weaponwalk();
+                weps.Weaponwalk();
                 rb.velocity = v.normalized * maxVelocity;
             }
             else w = false;
@@ -122,7 +127,7 @@ public class MovementManager : MonoBehaviour
             {
                 rb.AddRelativeForce(Vector3.forward * -speed);
                 s = true;
-                Weaponmanj.GetComponent<WeaponManagement>().Weaponwalk();
+                weps.Weaponwalk();
                 rb.velocity = v.normalized * maxVelocity;
             }
             else s = false;
@@ -130,7 +135,7 @@ public class MovementManager : MonoBehaviour
             {                
                 rb.AddRelativeForce(Vector3.right * -speed);
                 a = true;
-                Weaponmanj.GetComponent<WeaponManagement>().Weaponwalk();
+                weps.Weaponwalk();
                 rb.velocity = v.normalized * maxVelocity;
             }
             else a = false;
@@ -138,7 +143,7 @@ public class MovementManager : MonoBehaviour
             {
                 rb.AddRelativeForce(Vector3.right * speed);
                 d = true;
-                Weaponmanj.GetComponent<WeaponManagement>().Weaponwalk();
+                weps.Weaponwalk();
                 rb.velocity = v.normalized * maxVelocity;
             }
             else d = false;
@@ -155,7 +160,7 @@ public class MovementManager : MonoBehaviour
                             {
                                 if (grounded == true)
                                 {
-                                    Weaponmanj.GetComponent<WeaponManagement>().Weaponstop();
+                                    weps.Weaponstop();
                                     rb.Sleep();
                                 }
                             }   
@@ -164,6 +169,7 @@ public class MovementManager : MonoBehaviour
                 }
             }
         }
+        manj.Updateus();
         
     }
     public void knifejump()

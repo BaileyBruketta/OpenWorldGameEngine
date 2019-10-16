@@ -11,6 +11,7 @@ public class Animalmanager : MonoBehaviour
     public float threshold;
     public Transform player;
     public float rendertimer;
+    public int x;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,7 +21,7 @@ public class Animalmanager : MonoBehaviour
         {
             ang[i] = animals[i].GetComponent<AnimalScript>();
         }
-
+        x = 0;
     }
 
     // Update is called once per frame
@@ -30,7 +31,7 @@ public class Animalmanager : MonoBehaviour
     }
     public void timer()
     {
-        animaltimer -= .25f;
+        animaltimer -= 2f;
         if (animaltimer <=2)
         {
             checkanimals();
@@ -40,16 +41,26 @@ public class Animalmanager : MonoBehaviour
     public void checkanimals()
     {
         animaltimer = 5;
-        for (int i = 0; i < ang.Length; i++)
+
+        //for (int i = 0; i < ang.Length; i++)
+        //  {
+
+        //          ang[i].GetTheUpdate();
+
+        //  }
+        ang[x].GetTheUpdate();
+        Debug.Log("senttheupdate");
+        x += 1;
+        if (x ==animals.Length)
         {
-            ang[i].GetTheUpdate();
+            x = 0;
         }
 
         
     }
     public void rendercheck()
     {
-        rendertimer -= 1;
+        rendertimer -= .001f;
         if (rendertimer < 2)
         {
             rendie();

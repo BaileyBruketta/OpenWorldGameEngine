@@ -16,34 +16,56 @@ public class NpcManagement : MonoBehaviour
     public float[] xyzdif;
     public Transform player;
     public float threshold;
+    public NpcScript[] nengpc;
+    HUD hudx;
+    public int x;
     // Start is called before the first frame update
     void Start()
     {
+        hudx = hudie.GetComponent<HUD>();
         timer = 3;
-        timer2 = 5;
+        timer2 = 10;
+        for (int i = 0; i < NPCs.Length; i++)
+        {
+            nengpc[i]=NPCs[i].GetComponent<NpcScript>();
+        }
+        x = 0;
     }
     // Update is called once per frame
-    void Update()
+    public void Updateus()
     {
-        
-        movementmanager.GetComponent<MovementManager>().Update2();
+        weaponManagement.SingleFireTimer();
+       //movementmanager.GetComponent<MovementManager>().Update();
+
         if (timer > 0)
         {
-            timer -= .1f;
+            timer -= .3f;
             if (timer < 2.1f)
             {
                 UpdateNpcs();
-                
+                hudx.SlowHeal();
                 WeGotemboys();
                 timer = 2.5f;
+                timer2 -= .001f;
+                if (timer2 < 1)
+                {
+                    UpdateNPCs2();
+                }
             }
         }
     }
     public void UpdateNpcs()
     {
-        for (int i = 0; i < NPCs.Length; i++)
+        
+
+        //for (int i = 0; i < NPCs.Length; i++)
+        //{
+            nengpc[x].GetTheUpdate();
+        // }
+        x += 1;
+        if (x == NPCs.Length)
         {
-            NPCs[i].GetComponent<NpcScript>().GetTheUpdate();
+            x = 0;
         }
     }
     public void UpdateNPCs2()
@@ -61,8 +83,9 @@ public class NpcManagement : MonoBehaviour
                 NPCs[i].SetActive(true);
             }
 
-            NPCs[i].GetComponent<NpcScript>().GetTheUpdate();
+            //NPCs[i].GetComponent<NpcScript>().GetTheUpdate();
         }
+        timer2 = 10;
     }
     public void JustFired()
     {

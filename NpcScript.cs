@@ -80,6 +80,11 @@ public class NpcScript : MonoBehaviour
     public bool firing;
     public float maxvelocity;
     public float speed;
+    public bool aggro;
+    HitBoxController Hoxie;
+
+
+   
 
     public void Start()
     {
@@ -96,20 +101,178 @@ public class NpcScript : MonoBehaviour
         NewActionTimer = NewActionTimerStart;
         locale = 0;
         strobelight.SetActive(false);
-        
+        rb.maxAngularVelocity = .5f;
+        Hoxie = HitBoxManager.GetComponent<HitBoxController>();
+
+
+
+
+
     }
+    public void RegularMovement()
+    {
+        NewActionTimer -= NewActionDecreaseSpeed;
+
+        if (NewActionTimer < NewActionThreshold)
+        {
+            NewActionNumber = (Random.Range(0, 4));
+            NewActionTimer = NewActionTimerStart;
+        }
+
+        if (NewActionNumber == 0)
+        {
+            rb.Sleep();
+            rb.WakeUp();
+            anim.SetBool("Squatting", true);
+            NewActionTimer = 40;
+        }
+
+        if (NewActionNumber == 1)
+        {
+            rb.Sleep();
+            rb.WakeUp();
+            anim.SetBool("Idling", true);
+            NewActionTimer = 40;
+        }
+
+        if (NewActionNumber == 2)
+        {
+            if (locale == 0)
+            {
+                Vector3 position0 = new Vector3(Location0xyz[0], Location0xyz[1], Location0xyz[2]);
+                var lookDir = position0 - transform.position;
+                lookDir.y = 0; // keep only the horizontal direction
+                transform.rotation = Quaternion.LookRotation(lookDir);
+            }
+
+            rb.Sleep();
+            rb.WakeUp();
+            anim.SetBool("Walking", true);
+            var v = rb.velocity;
+            rb.AddRelativeForce(Vector3.forward * speed);
+            rb.velocity = v.normalized * maxvelocity;
+            NewActionTimer = 40;
+        }
+    }
+    public void CombatMovement()
+    {
+        speed = 600;
+        maxvelocity = 80;
+        int layerMask = (1 << 9) | (1 << 10) | (1 << 11);  //npc layer and npc hitbox layer
+        layerMask = ~layerMask;
+
+        if (xyzdif > 30)
+        {
+            rb.Sleep();
+            rb.WakeUp();
+            anim.SetBool("running", true);
+            anim.SetBool("Walking", false);
+            var v = rb.velocity;
+            rb.AddRelativeForce(Vector3.forward * speed);
+            rb.velocity = v.normalized * maxvelocity;
+            NewActionTimer = 40;
+            
+        }
+        if (xyzdif < 30)
+        {
+            anim.SetBool("running", false);
+        }
+        //int layerMask = (1 << 9) | (1 << 10) | (1 << 11);  //npc layer and npc hitbox layer
+        layerMask = ~layerMask; //inverts raycast so raycast avoids these layers 
+
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 1, layerMask))
+        {
+            Debug.Log("whatsinfront");
+            rb.Sleep();
+            rb.WakeUp();
+            transform.eulerAngles = new Vector3(0, Random.Range(0, 40), 0);
+        }
+    }
+    public void soundcheck()
+    {
+        xyzdif = Vector3.Distance(NPC.transform.position, player.transform.position);
+        if (xyzdif < closethreshold)
+        {
+            Sneakmeter -= Sneakmeterdecrease;
+        }
+        if (Sneakmeter < sneakmeterthreshold)
+        {
+            LookAtThePlayer();
+            Sneakmeter = sneakmeterstart;
+        }
+
+    }
+    public void LookAtThePlayer()
+    {
+        var lookDir = player.position - transform.position;
+        lookDir.y = 0; // keep only the horizontal direction
+        transform.rotation = Quaternion.LookRotation(lookDir);
+    }
+    public void VisionCheck()
+    {
+        SPINE.position = new Vector3(transform.position.x, playercenter.transform.position.y, transform.position.z);
+
+        RaycastHit hit; //
+        int layerMask = (1 << 9) | (1 << 10) | (1 << 11);  //npc layer and npc hitbox layer
+        layerMask = ~layerMask; //inverts raycast so raycast avoids these layers 
+        if (Physics.Raycast(SPINE.position, SPINE.forward, out hit, sightrange, layerMask))
+        {
+            playerhitbox target = hit.transform.GetComponent<playerhitbox>();
+            if (target != null) //if the ray hits the player
+            {
+                seen = true;
+                seentimer = 10;
+                strobelight.SetActive(true);
+
+
+                shotsfiredbool = true;
+                Debug.Log("seen" + gameObject.name);
+                rb.Sleep();
+                rb.WakeUp();
+                Punch();
+                anim.SetBool("Aiming", true);
+                var lookDir = player.position - transform.position;
+                lookDir.y = 0; // keep only the horizontal direction
+                transform.rotation = Quaternion.LookRotation(lookDir);
+                anim.SetTrigger("Shuffle");
+
+                RateOfFire -= RateOfFireDecrease;  //getting ready to fire
+                npcmanager.GetComponent<NpcManagement>().JustFired();  //let npcmanager know to tell other npcs to ook around
+
+
+                anim.SetBool("Aiming", true);
+                isalert = true;
+                TakeShot();
+
+            }
+        }   }
+
     public void GetTheUpdate() //called by outside npcmanager script
     {
         //rotationscript.SetActive(false);
-
+        Hoxie.UpdateBoxes();
         if (seen == true)
         {
-            var lookDir = player.position - transform.position;
-            lookDir.y = 0; // keep only the horizontal direction
-            transform.rotation = Quaternion.LookRotation(lookDir);
+            if (isdead == false)
+            {
+                LookAtThePlayer();
+                VisionCheck();
+                CombatMovement();
+                //TakeShot();
+            }
+        }
+        if (seen == false)
+        {
+            if (isdead == false)
+            {
+                soundcheck();
+                VisionCheck();
+                RegularMovement();
+            }
         }
 
-        rb.maxAngularVelocity = 5;
+        
         xyzdif = Vector3.Distance(NPC.transform.position, player.transform.position);
 
         if (xyzdif < 40)
@@ -118,151 +281,10 @@ public class NpcScript : MonoBehaviour
         }
         if (xyzdif > 40)
         {
-            sightrange =0;
+            sightrange =120;
         }
 
-        Debug.Log("gottheupdate" + gameObject.name);
-        if (isdead == false)
-        {
-            RaycastHit hit; //
-            int layerMask = (1 << 9) | (1 << 10)|(1<<11);  //npc layer and npc hitbox layer
-            layerMask = ~layerMask; //inverts raycast so raycast avoids these layers 
-            if (Physics.Raycast(SPINE.position, SPINE.forward, out hit, sightrange, layerMask))
-            {
-                playerhitbox target = hit.transform.GetComponent<playerhitbox>();
-                if (target != null) //if the ray hits the player
-                {
-                    seen = true;
-                    seentimer = 10;
-                    strobelight.SetActive(true);
-                    
-                    rotationscript.SetActive(false);
-
-                    shotsfiredbool = true;
-                    Debug.Log("seen" + gameObject.name);
-                    rb.Sleep();
-                    rb.WakeUp();
-                    Punch();
-                    anim.SetBool("Aiming", true);
-                    var lookDir = player.position - transform.position;
-                    lookDir.y = 0; // keep only the horizontal direction
-                    transform.rotation = Quaternion.LookRotation(lookDir);
-                    anim.SetTrigger("Shuffle");
-
-                    RateOfFire -= RateOfFireDecrease;  //getting ready to fire
-                                                        npcmanager.GetComponent<NpcManagement>().JustFired();  //let npcmanager know to tell other npcs to ook around
-
-                    
-                        anim.SetBool("Aiming", true);
-                        isalert = true;
-                        TakeShot();
-                    
-                }
-
-             if (target == null)
-                
-                {
-                    if (seentimer > 0)
-                    {
-                        seentimer -= 1;
-                    }
-                    if (seentimer < 2)
-                    {
-                        seen = false;
-                    }
-                        SPINE.position = new Vector3(transform.position.x, playercenter.transform.position.y + 1, transform.position.z);
-                    if (seen == false)
-                    { 
-                            Debug.Log("nulltarget" + gameObject.name);
-                            Vector3 targetDir = player.position - transform.position; //angle of peripheral vision with enemys head as one line of the angle
-                            float angle = Vector3.Angle(targetDir, transform.forward);
-                        if (angle < 70)
-                        {
-                        rotationscript.SetActive(true);
-                        }
-
-                        if (angle > 70)
-                        {
-                            Debug.Log("more70" + gameObject);
-                            xyzdif = Vector3.Distance(NPC.transform.position, player.transform.position);
-
-                            if (xyzdif < closethreshold)
-                            {
-                                Debug.Log("lessthreshold" + gameObject);
-                                Sneakmeter -= 1;
-
-                                if (Sneakmeter < sneakmeterthreshold)
-                                {
-                                    shotsfiredbool = true;
-                                    strobelight.SetActive(true);
-                                    rotationscript.SetActive(true);
-                                }
-                            }
-
-                            if (shotsfiredbool == true)
-                            {
-                                rotationscript.SetActive(true);
-                            }
-                    }
-                        if (seen == true)
-                        {
-                            var lookDir = player.position - transform.position;
-                            lookDir.y = 0; // keep only the horizontal direction
-                            transform.rotation = Quaternion.LookRotation(lookDir);
-                        }
-
-                    if (shotsfiredbool == false)
-                    {
-                            NewActionTimer -= NewActionDecreaseSpeed;
-
-                            if (NewActionTimer < NewActionThreshold)
-                            {
-                                NewActionNumber = (Random.Range(0, 4));
-                            }
-
-                            if (EnemyClassification == 0)
-                            {
-                                if (NewActionNumber == 0)
-                                {
-                                    rb.Sleep();
-                                    rb.WakeUp();
-                                    anim.SetBool("Squatting", true);
-                                    NewActionTimer = 40;
-                                }
-
-                                if (NewActionNumber == 1)
-                                {
-                                    rb.Sleep();
-                                    rb.WakeUp();
-                                    anim.SetBool("Idling", true);
-                                    NewActionTimer = 40;
-                                }
-
-                                if (NewActionNumber == 2)
-                                {
-                                    if (locale == 0)
-                                    {
-                                        Vector3 position0 = new Vector3(Location0xyz[0], Location0xyz[1], Location0xyz[2]);
-                                        var lookDir = position0 - transform.position;
-                                        lookDir.y = 0; // keep only the horizontal direction
-                                        transform.rotation = Quaternion.LookRotation(lookDir);
-                                    }
-
-                                    rb.Sleep();
-                                    rb.WakeUp();
-                                    anim.SetBool("Walking", true);
-                                    var v = rb.velocity;
-                                    rb.AddRelativeForce(Vector3.forward * speed);
-                                    rb.velocity = v.normalized * maxvelocity;
-                                    NewActionTimer = 40;
-                                }
-                            }
-                    }
-                    }
-                }
-            } else
-            SPINE.position = new Vector3(transform.position.x, playercenter.transform.position.y, transform.position.z);
-        }
+       
         if (isdead == true)
         {
             strobelight.SetActive(false);
@@ -281,21 +303,12 @@ public class NpcScript : MonoBehaviour
 
         }
         
+        
        
     }
     public void TakeShot()
     {
-       // aimableweapon.SetActive(true);
-        
-      //  aimableweapon.transform.LookAt(playercenter);
-       // animatedweaponpiece1.GetComponent<MeshRenderer>().enabled = false;
-      //  animatedweaponpiece2.GetComponent<MeshRenderer>().enabled = false;
-      //  animatedweaponpiece3.GetComponent<MeshRenderer>().enabled = false;
-       // actualweapon.transform.LookAt(playercenter);
-        GunMuzzle.transform.LookAt(playercenter);
-
-
-        
+        GunMuzzle.transform.LookAt(playercenter); 
         anim.SetBool("Aiming", true);
         anim.SetTrigger("Fire");
         RaycastHit hit;
@@ -307,7 +320,6 @@ public class NpcScript : MonoBehaviour
             if (target != null)
             {
                 RateOfFire -= RateOfFireDecrease;
-
                 if (RateOfFire < 1)
                 {
                     GameObject blik = Instantiate(blood, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
@@ -337,13 +349,19 @@ public class NpcScript : MonoBehaviour
         {
             if (xyzdif > -90)
             {
-                shotsfiredbool = true;
+                LookAtThePlayer();
+                seen = true;
             }
         }
     }
     public void DeathHeard(float x, float y, float z) //has enemy turn to face dead npc 
     {
         shotsfiredbool = true;
+        seen = true;
+        Vector3 deathspot = new Vector3(x, y, z);
+        var lookDir = deathspot - transform.position;
+        lookDir.y = 0; // keep only the horizontal direction
+        transform.rotation = Quaternion.LookRotation(lookDir);
     }
     public void GetStabbed()
     {
@@ -388,6 +406,7 @@ public class NpcScript : MonoBehaviour
             npcmanager.GetComponent<NpcManagement>().JustFired();
         }
         playerhud.addexperience(experiencetogive);
+        
 
     }
     public void TakeDamage(float damage) //applies damage to the enemy and checks for death. called through hitbox and triggered by impact with bullets or melee weapons
