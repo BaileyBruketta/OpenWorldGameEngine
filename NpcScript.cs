@@ -70,21 +70,22 @@ public class NpcScript : MonoBehaviour
     public float NewActionNumber;
     public float NewActionTimerStart;
     public float EnemyClassification;
-    public float[] Location0xyz;
-    public float[] Location1xyz;
-    public float[] Location2xyz;
-    public float[] Location3xyz;
-    public float[] Location4xyz;
+    public Transform[] Location;
     
-    public float locale;
+    public float locationxyzdif;
+    
+    
+    public int locale;
     public bool firing;
-    public float maxvelocity;
-    public float speed;
+    public float maxvelocity = 150;
+    public float speed = 150;
     public bool aggro;
     HitBoxController Hoxie;
 
+    public bool walkionary;
+    public float numberofwaypoints;
+    public float walkstutter;
 
-   
 
     public void Start()
     {
@@ -99,11 +100,13 @@ public class NpcScript : MonoBehaviour
         dummyweaponadded = false;
         firing = false;
         NewActionTimer = NewActionTimerStart;
-        locale = 0;
+        
         strobelight.SetActive(false);
         rb.maxAngularVelocity = .5f;
         Hoxie = HitBoxManager.GetComponent<HitBoxController>();
-
+        aggro = false;
+        locale = 0;
+        walkstutter = 2;
 
 
 
@@ -116,42 +119,87 @@ public class NpcScript : MonoBehaviour
         if (NewActionTimer < NewActionThreshold)
         {
             NewActionNumber = (Random.Range(0, 4));
-            NewActionTimer = NewActionTimerStart;
+            //NewActionTimer = (Random.Range(20,80));
         }
 
         if (NewActionNumber == 0)
         {
             rb.Sleep();
             rb.WakeUp();
-            anim.SetBool("Squatting", true);
-            NewActionTimer = 40;
+            //anim.SetBool("Squatting", true);
         }
 
         if (NewActionNumber == 1)
         {
             rb.Sleep();
             rb.WakeUp();
-            anim.SetBool("Idling", true);
-            NewActionTimer = 40;
+            //anim.SetBool("Idling", true);
         }
 
         if (NewActionNumber == 2)
         {
-            if (locale == 0)
+            if (walkionary == true)
             {
-                Vector3 position0 = new Vector3(Location0xyz[0], Location0xyz[1], Location0xyz[2]);
-                var lookDir = position0 - transform.position;
-                lookDir.y = 0; // keep only the horizontal direction
-                transform.rotation = Quaternion.LookRotation(lookDir);
+                WalkRoutine();
             }
+            else if (walkionary == false)
+            {
+                TakeNewAction();
+            }
+        }
+    }
+    public void TakeNewAction()
+    {
+        NewActionNumber = (Random.Range(0, 4));
+        if (NewActionNumber == 0)
+        {
+            NewActionTimer = 15;
+        }
+        if (NewActionNumber == 1)
+        {
+            NewActionTimer = 20;
+        }
+        if (NewActionNumber == 2)
+        {
+            anim.SetBool("Walking", true);
+            anim.SetBool("Idling", false);
+            anim.SetBool("Squatting", false);
+            NewActionTimer = 80;
+        }
+    }
+       public void WalkRoutine()
+    {
+        walkstutter -= 1;
+        
 
+            //Vector3 position0 = new Vector3(Location[locale], Locationy[locale], Locationz[locale]);//sets waypoint
+
+            locationxyzdif = Vector3.Distance(transform.position, Location[locale].position);
+            if (locationxyzdif < 3)
+            {
+                if (locale < numberofwaypoints)
+                {
+                    locale += 1;
+                }
+                else if (locale == numberofwaypoints)
+                {
+                    locale = 0;
+                }
+                //changes waypoint
+            }
+            var lookDir = Location[locale].position - transform.position;
+            lookDir.y = 0; // keep only the horizontal direction
+            transform.rotation = Quaternion.LookRotation(lookDir);
+        if (walkstutter == 0)
+        {
             rb.Sleep();
             rb.WakeUp();
-            anim.SetBool("Walking", true);
             var v = rb.velocity;
             rb.AddRelativeForce(Vector3.forward * speed);
             rb.velocity = v.normalized * maxvelocity;
-            NewActionTimer = 40;
+            NewActionTimer = 80;
+            anim.SetBool("Walking", true);
+            walkstutter=2;
         }
     }
     public void CombatMovement()
@@ -252,24 +300,31 @@ public class NpcScript : MonoBehaviour
     {
         //rotationscript.SetActive(false);
         Hoxie.UpdateBoxes();
-        if (seen == true)
+        if (aggro == true)
         {
-            if (isdead == false)
+            if (seen == true)
             {
-                LookAtThePlayer();
-                VisionCheck();
-                CombatMovement();
-                //TakeShot();
+                if (isdead == false)
+                {
+                    LookAtThePlayer();
+                    VisionCheck();
+                    CombatMovement();
+                    //TakeShot();
+                }
+            }
+            if (seen == false)
+            {
+                if (isdead == false)
+                {
+                    soundcheck();
+                    VisionCheck();
+                    RegularMovement();
+                }
             }
         }
-        if (seen == false)
+        if (aggro == false)
         {
-            if (isdead == false)
-            {
-                soundcheck();
-                VisionCheck();
-                RegularMovement();
-            }
+            RegularMovement();
         }
 
         
@@ -349,7 +404,9 @@ public class NpcScript : MonoBehaviour
         {
             if (xyzdif > -90)
             {
+                aggro = true;
                 LookAtThePlayer();
+                
                 seen = true;
             }
         }
@@ -362,6 +419,8 @@ public class NpcScript : MonoBehaviour
         var lookDir = deathspot - transform.position;
         lookDir.y = 0; // keep only the horizontal direction
         transform.rotation = Quaternion.LookRotation(lookDir);
+        aggro = true;
+
     }
     public void GetStabbed()
     {
@@ -373,6 +432,7 @@ public class NpcScript : MonoBehaviour
         if (health > 0)
         {
             health -= damage;
+            aggro = true;
             CheckHealth();
         }
     }

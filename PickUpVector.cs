@@ -39,7 +39,7 @@ public class PickUpVector : MonoBehaviour
     {
         
         wholedif = Vector3.Distance(thisgun.transform.position, player.transform.position);
-        if (wholedif < 10)
+        if (wholedif < 5)
         {
             pickup();
         }

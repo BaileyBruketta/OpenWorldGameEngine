@@ -19,6 +19,7 @@ public class NpcManagement : MonoBehaviour
     public NpcScript[] nengpc;
     HUD hudx;
     public int x;
+    public float enemy;
     // Start is called before the first frame update
     void Start()
     {

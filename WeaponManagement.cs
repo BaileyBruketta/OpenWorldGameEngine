@@ -45,6 +45,16 @@ public class WeaponManagement : MonoBehaviour
     public float vectordamage;
     private float Vectortimer;
 
+    public bool glocknineEquipped;
+    public bool glocknineHave;
+    public GameObject glocknine;
+    public GameObject glockninebody;
+    public float glockninemagazine;
+    public float glocknineweaponrange;
+    public Transform glocknineMuzzle;
+    public float glockninedamage;
+    private float glockninetimer;
+
     public bool HuntingRifleHave;
     public bool HuntingRifleEquipped;
     public GameObject HuntingRifle;
@@ -90,6 +100,9 @@ public class WeaponManagement : MonoBehaviour
         knifetimer = 4;
         HuntingRifleTimer = 10;
         weaponequipnumber = 0;
+        glockninetimer = 2;
+        glockninedamage = vectordamage;
+        glocknineweaponrange = 400;
     }
 
     // Update is called once per frame
@@ -141,6 +154,10 @@ public class WeaponManagement : MonoBehaviour
         {
             HuntingRifleTimer -= 1;
         }
+        if (glocknineEquipped == true)
+        {
+            glockninetimer -= 1;
+        }
     }
     //for changing weapons on the fly
     public void ChangeWeapons2() //checks to see which weapon/weaponslot you're using 
@@ -160,6 +177,9 @@ public class WeaponManagement : MonoBehaviour
                 EquipSMGs();
                 changing = true;
             }else if (weaponequipnumber == 3)
+            {
+                EquipHandguns();
+            }else if (weaponequipnumber == 4)
             {
                 EquipHands();
             }
@@ -190,6 +210,14 @@ public class WeaponManagement : MonoBehaviour
             EquipVector();
         }
     }
+    public void EquipHandguns()
+    {
+        weaponequipnumber = 4;
+        if (glocknineHave == true)
+        {
+            EquipGlockNine();
+        }
+    }
    
     //checks to see which equipped weapon for firing, ADS, draw, etc
     public void CheckWeapons() //called on click left button
@@ -213,6 +241,10 @@ public class WeaponManagement : MonoBehaviour
         if (HuntingRifleEquipped == true)
         {
             FireRifle();
+        }
+        if (glocknineEquipped)
+        {
+            Fireglocknine();
         }
     }
     public void ReleaseWeapons() //called on release left button
@@ -243,6 +275,10 @@ public class WeaponManagement : MonoBehaviour
         {
             HuntingRiflewalk();
         }
+        if (glocknineEquipped == true)
+        {
+            GlockNinewalk();
+        }
     }
     public void Weaponstop() //called when movement stops
     {
@@ -254,6 +290,10 @@ public class WeaponManagement : MonoBehaviour
         {
             HuntingRiflestop();
         }
+        if (glocknineEquipped == true)
+        {
+            GlockNinestop();
+        }
     }
 
     //aiming down sight 
@@ -261,6 +301,7 @@ public class WeaponManagement : MonoBehaviour
     {
         if (VectorEquipped == true)
         {
+            maincam.fieldOfView = 108;
             Vector.GetComponent<Animator>().SetBool("ads", true);
             
         }
@@ -272,12 +313,18 @@ public class WeaponManagement : MonoBehaviour
             maincam.fieldOfView = 15;
 
         }
+        if (glocknineEquipped == true)
+        {
+            maincam.fieldOfView = 108;
+            glocknine.GetComponent<Animator>().SetBool("ads", true);
+        }
         hitmarker1.SetActive(false);
     }
     public void ReleaseAim() //called on release right button
     {
         if (VectorEquipped == true)
         {
+            maincam.fieldOfView = 110;
             Vector.GetComponent<Animator>().SetBool("ads", false);
 
         }
@@ -289,9 +336,14 @@ public class WeaponManagement : MonoBehaviour
             scopebody.SetActive(true);
 
         }
+        if (glocknineEquipped == true)
+        {
+            maincam.fieldOfView = 110;
+            glocknine.GetComponent<Animator>().SetBool("ads", false);
+        }
         hitmarker1.SetActive(true);
     }
-
+    
     //deals with knives
     public void GrabTanto()
     {
@@ -403,6 +455,95 @@ public class WeaponManagement : MonoBehaviour
             Weaponry.GetComponent<weaponry>().ReleaseLeft();
             hands = 0;
         }
+    }
+    //deals with handguns
+    public void GlockNinewalk()
+    {
+        glocknine.GetComponent<Animator>().SetBool("walk", true);
+    }
+    public void GlockNinestop()
+    {
+        glocknine.GetComponent<Animator>().SetBool("walk", false);
+    }
+    public void GrabGlockNine()
+    {
+        if (HuntingRifleHave == true)
+        {
+            GlockNineFalse();
+        }
+        else if (HuntingRifleHave == false)
+        {
+            GlockNineTrue();
+        }
+    }
+    public void GlockNineTrue()
+    {
+        glocknineHave = true;
+    }
+    public void GlockNineFalse()
+    {
+        glocknineHave = false;
+    }
+    public void EquipGlockNine()
+    {
+        glocknineEquipped = true;
+        HuntingRifleEquipped = false;
+        HandsEquipped = false;
+        KnifeEquipped = false;
+        VectorEquipped = false;
+        Weaponry.GetComponent<weaponry>().EquipGlock();
+        activeammo = NineMillimeterRounds;
+        activemagazine = glockninemagazine;
+        hud.AmmoUpdate();
+    }
+    public void Fireglocknine()
+    {
+        if (glockninetimer < 1)
+        {
+            if (glockninemagazine > 0)
+            {
+
+                NPCmanager.GetComponent<NpcManagement>().JustFired(); //lets NPCs know you fired, so they can look for you 
+                glocknine.GetComponent<Animator>().SetTrigger("Fire");                                               //HuntingRifle.GetComponent<Animator>().SetTrigger("Fire");  //plays a firing animation
+                Instantiate(muzzleflash, glocknineMuzzle.position, glocknineMuzzle.rotation);  //muzzleflash
+                Instantiate(smoke, glocknineMuzzle.position, glocknineMuzzle.rotation);  //gunsmoke
+
+                //stores location of raycast hit
+                RaycastHit hit;
+                //makes raycast avoid game-layer with player and ui
+
+                int layerMask = (1 << 8) | (1 << 9);
+                layerMask = ~layerMask;
+                //casts ray
+                if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, glocknineweaponrange, layerMask))
+                {
+                    //makes an impact particle effect
+
+
+                    HitBox target = hit.transform.GetComponent<HitBox>();         // this checks to see if object hit has a certain script
+                    if (target != null)
+                    {
+                        target.HitByProjectile(glockninedamage);
+                        GameObject blik = Instantiate(blood, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
+                        blik.transform.SetParent(target.transform);
+                        GameObject smokes = Instantiate(sparks, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
+                        smokes.transform.SetParent(target.transform);
+                    }
+                    else Instantiate(sparks, hit.point, Quaternion.LookRotation(hit.normal));
+                }
+
+
+
+                cam.transform.rotation *= Quaternion.Euler(-.2f, 0, 0.0f);
+
+                glockninemagazine -= 1;
+                activemagazine = glockninemagazine;
+
+                hud.AmmoUpdate();
+                glockninetimer = 8;
+            }
+        }
+
     }
     //deals with hunting rifle
     public void HuntingRiflewalk()
@@ -605,6 +746,10 @@ public class WeaponManagement : MonoBehaviour
         {
             HuntingRifleReload();
         }
+        else if (glocknineEquipped == true)
+        {
+            glocknineReload();
+        }
     }
     public void VectorReload()
     {
@@ -629,6 +774,34 @@ public class WeaponManagement : MonoBehaviour
                     Vectormagazine = activemagazine;
                     NineMillimeterRounds = activeammo;
                     Vectortimer = 8;
+                }
+                hud.AmmoUpdate();
+            }
+        }
+    }
+    public void glocknineReload()
+    {
+        if (NineMillimeterRounds > 0)
+        {
+            if (glockninemagazine < 12)
+            {
+                glocknine.GetComponent<Animator>().SetTrigger("Reload");
+                var f = NineMillimeterRounds + glockninemagazine;
+                if (f > 15)
+                {
+                    activemagazine = 15;
+                    activeammo = f - 15;
+                    glockninemagazine = activemagazine;
+                    NineMillimeterRounds = activeammo;
+                    glockninetimer = 8;
+                }
+                else if (f <= 15)
+                {
+                    activemagazine = f;
+                    activeammo = 0;
+                    glockninemagazine = activemagazine;
+                    NineMillimeterRounds = activeammo;
+                    glockninetimer = 8;
                 }
                 hud.AmmoUpdate();
             }

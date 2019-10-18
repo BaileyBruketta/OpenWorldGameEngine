@@ -20,6 +20,8 @@ public class weaponry : MonoBehaviour
 
     public GameObject HuntingRifle;
 
+    public GameObject HandGun;
+
     Animator KN;
    
     // Start is called before the first frame update
@@ -31,15 +33,26 @@ public class weaponry : MonoBehaviour
         KN = Knifehands.GetComponent<Animator>();
     }
 
-    
- //rifle based motions
- public void EquipRifle()
+    //handgunshit
+    public void EquipGlock()
+    {
+        HandGun.SetActive(true);
+        
+        IdleHands.SetActive(false);
+        PunchingHands.SetActive(false);
+        Knifehands.SetActive(false);
+        Vector1.SetActive(false);
+        HuntingRifle.SetActive(false);
+    }
+    //rifle based motions
+    public void EquipRifle()
     {
         IdleHands.SetActive(false);
         PunchingHands.SetActive(false);
         Knifehands.SetActive(false);
         Vector1.SetActive(false);
         HuntingRifle.SetActive(true);
+        HandGun.SetActive(false);
     }
     //Vectro based motions
     public void FireVector()
@@ -53,6 +66,7 @@ public class weaponry : MonoBehaviour
         Knifehands.SetActive(false);
         Vector1.SetActive(true);
         HuntingRifle.SetActive(false);
+        HandGun.SetActive(false);
     }
     //hand based motions
     public void EquipHands()
@@ -61,6 +75,7 @@ public class weaponry : MonoBehaviour
         Vector1.SetActive(false);
         IdleHands.SetActive(true);
         HuntingRifle.SetActive(false);
+        HandGun.SetActive(false);
     }
     public void RightPunch()
     {
@@ -112,6 +127,7 @@ public class weaponry : MonoBehaviour
         PunchingHands.SetActive(false);
         Vector1.SetActive(false);
         HuntingRifle.SetActive(false);
+        HandGun.SetActive(false);
     }
 
 

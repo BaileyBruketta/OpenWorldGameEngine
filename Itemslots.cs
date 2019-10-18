@@ -40,6 +40,7 @@ public class Itemslots : MonoBehaviour, IPointerClickHandler
     public Item Tanto;
     public Item Apple;
     public Item HuntingRifle;
+    public Item glocknine;
     protected virtual private void OnValidate()
     {
         if (image == null)
@@ -69,6 +70,10 @@ public class Itemslots : MonoBehaviour, IPointerClickHandler
                 if (Item == Tanto)
                 {
                     weaponmanagement.GrabTanto();
+                }
+                if (Item == glocknine)
+                {
+                    weaponmanagement.GrabGlockNine();
                 }
                 OnLeftClickEvent(Item);
 
