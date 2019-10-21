@@ -6,10 +6,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] Inventory inventory;
     [SerializeField] EquipmentPanel equipmentPanel;
 
-    public void Update()
-    {
-
-    }
+    
     private void Awake()
     {
         inventory.OnItemLeftClickedEvent += EquipFromInventory;

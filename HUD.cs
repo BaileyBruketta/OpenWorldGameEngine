@@ -35,6 +35,9 @@ public class HUD : MonoBehaviour
 
     public float skillpoints;
 
+    public float commonwealthcredits;
+    public Text CommonwealthCredsText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -44,6 +47,7 @@ public class HUD : MonoBehaviour
         HungerDisplay.text = "HUNGER: " + hunger + "/" + maxhunger;
         AmmoDisplay.text = "AMMO: " + magazine + "/" + ammo;
         ispaused = false;
+        CommonwealthCredsText.text = "Commonwealth Credits : " + commonwealthcredits;
         experiencepoints = 0;
         experiencetext.text = "LV" + Level + ": " + experiencepoints + "/" + experiencecap[l];
         skillpoints = 0;
@@ -185,5 +189,10 @@ public class HUD : MonoBehaviour
         experiencepoints = g;
         Level +=1;
         updatelevel();
+    }
+    public void ChangeCredits(float creds)
+    {
+        commonwealthcredits += creds;
+        CommonwealthCredsText.text = "Commonwealth Credits : " + commonwealthcredits;
     }
 }

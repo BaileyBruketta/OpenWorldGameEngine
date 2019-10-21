@@ -6,6 +6,7 @@ public class InteractAble : MonoBehaviour
 {
     public float itemtype;
     //1=door
+    //2=merchant
     public bool dooropen;
     
     public GameObject door1closed;
@@ -13,6 +14,7 @@ public class InteractAble : MonoBehaviour
     public Transform thisobject;
     public Transform player;
     public float xyzdif;
+    public GameObject merchantmenu;
     
     // Start is called before the first frame update
     void Start()
@@ -46,6 +48,13 @@ public class InteractAble : MonoBehaviour
                 Doorcheck();
             }
         }
+        if (xyzdif < 8)
+        {
+            if (itemtype == 2)
+            {
+
+            }
+        }
         
         
     }
@@ -63,6 +72,10 @@ public class InteractAble : MonoBehaviour
                 Debug.Log("Openthedoor");
             }
         
+    }
+    public void Merchant()
+    {
+        merchantmenu.SetActive(true);
     }
     
     public void OpenDoor()
