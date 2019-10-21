@@ -10,8 +10,8 @@ public class merchantitemslot : MonoBehaviour, IPointerClickHandler
     [SerializeField] Image image;
     
     [SerializeField] HUD hud;
-
-    public event Action<Item> OnLeftClickEvent;
+    [SerializeField] Inventory inventory;
+     public event Action<Item> OnLeftClickEvent;
     public Item _item;
     public int goar;
     public float creds;
@@ -59,23 +59,36 @@ public class merchantitemslot : MonoBehaviour, IPointerClickHandler
         {
             if (Item != null && OnLeftClickEvent != null)
             {
+                playercurrency = hud.commonwealthcredits;
                 if (Item = vectorsmg)
                 {
-                    creds = -320;
-                    playercurrency = hud.commonwealthcredits;
-                    hud.ChangeCredits(creds);
+                    if (playercurrency > 319)
+                    {
+                        creds = -320;
+                        
+                        hud.ChangeCredits(creds);
+                        inventory.AddItem(vectorsmg);
+                    }
                 }
                 if (Item = Tanto)
                 {
-                    creds = -12;
-                    playercurrency = hud.commonwealthcredits;
-                    hud.ChangeCredits(creds);
+                    if (playercurrency > 11)
+                    {
+                        creds = -12;
+                        
+                        hud.ChangeCredits(creds);
+                        inventory.AddItem(Tanto);
+                    }
                 }
                 if (Item = HuntingRifle)
                 {
-                    creds = -170;
-                    playercurrency = hud.commonwealthcredits;
-                    hud.ChangeCredits(creds);
+                    if (playercurrency > 169)
+                    {
+                        creds = -170;
+
+                        hud.ChangeCredits(creds);
+                        inventory.AddItem(HuntingRifle);
+                    }
                 }
                 OnLeftClickEvent(Item);
 

@@ -11,6 +11,8 @@ public class merchantinventory : MonoBehaviour
     [SerializeField] Transform itemsParent;
     [SerializeField] merchantitemslot[] merchantitemslots;
     [SerializeField] HUD hud;
+    public Item[] defaultitems;
+    
 
 
     public event Action<Item> OnItemLeftClickedEvent;
@@ -25,6 +27,10 @@ public class merchantinventory : MonoBehaviour
             merchantitemslots[i].OnLeftClickEvent += OnItemLeftClickedEvent;
         }
 
+        for (int i =0; i<defaultitems.Length; i++)
+        {
+            AddItem(defaultitems[i]);
+        }
         RefreshUI();
     }
 

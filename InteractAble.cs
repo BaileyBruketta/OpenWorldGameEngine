@@ -15,6 +15,7 @@ public class InteractAble : MonoBehaviour
     public Transform player;
     public float xyzdif;
     public GameObject merchantmenu;
+    public bool MenuUp;
     
     // Start is called before the first frame update
     void Start()
@@ -32,6 +33,7 @@ public class InteractAble : MonoBehaviour
                 door1closed.SetActive(true);
             }
         }
+        MenuUp = false;
        
 
     }
@@ -52,7 +54,7 @@ public class InteractAble : MonoBehaviour
         {
             if (itemtype == 2)
             {
-
+                Merchant();
             }
         }
         
@@ -75,9 +77,26 @@ public class InteractAble : MonoBehaviour
     }
     public void Merchant()
     {
+        if (MenuUp == false)
+        {
+            MenuGoesUp();
+        }else if (MenuUp == true)
+        {
+            MenuGoesDown();
+        }
+
+    }
+    public void MenuGoesUp()
+        
+    {
+        MenuUp = true;
         merchantmenu.SetActive(true);
     }
-    
+    public void MenuGoesDown()
+    {
+        MenuUp = false;
+        merchantmenu.SetActive(false);
+    }
     public void OpenDoor()
     {
         dooropen = true;
