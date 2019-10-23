@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 public class merchantitemslot : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] Image image;
-    
+    [SerializeField] Text text;
     [SerializeField] HUD hud;
     [SerializeField] Inventory inventory;
      public event Action<Item> OnLeftClickEvent;
@@ -28,13 +28,17 @@ public class merchantitemslot : MonoBehaviour, IPointerClickHandler
             _item = value;
             if (_item == null)
             {
-                image.enabled = false;
+                //image.enabled = false;
+                text.enabled = false;
 
             }
             else
             {
-                image.sprite = _item.icon;
-                image.enabled = true;
+                //image.sprite = _item.icon;
+                //image.enabled = true;
+                text.enabled = true;
+                text.text = Item.GameName + " - " + Item.VendorPrice;
+                
             }
         }
     }
@@ -88,6 +92,15 @@ public class merchantitemslot : MonoBehaviour, IPointerClickHandler
 
                         hud.ChangeCredits(creds);
                         inventory.AddItem(HuntingRifle);
+                    }
+                }
+                if (Item = glocknine)
+                {
+                    if (playercurrency > 98)
+                    {
+                        creds -= 99;
+                        hud.ChangeCredits(creds);
+                        inventory.AddItem(glocknine);
                     }
                 }
                 OnLeftClickEvent(Item);

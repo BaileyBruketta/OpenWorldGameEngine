@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    [SerializeField] List<Item> items;
+    public List<Item> items;
     [SerializeField] Transform itemsParent;
-    [SerializeField] Itemslots[] itemSlots;
+    public Itemslots[] itemSlots;
     
 
     public event Action<Item> OnItemLeftClickedEvent;

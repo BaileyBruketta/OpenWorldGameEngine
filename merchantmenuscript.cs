@@ -43,23 +43,29 @@ public class merchantmenuscript : MonoBehaviour
 
     public void Sell(EquippableItem item)
     {
-        if (playerinventory.RemoveItem(item))
-        {
-
+       // if (playerinventory.RemoveItem(item))
+        //{
+            playerinventory.RemoveItem(item);
             merchantinventory.AddItem(item);
             creds = hud.commonwealthcredits;
             commonwealthcreds.text = "Commonwealth Credits : " + creds;
 
-        }
+       // }
     }
 
     public void Buy(EquippableItem item)
     {
-        if (!playerinventory.IsFull() && merchantinventory.RemoveItem(item))
+        if (!playerinventory.IsFull())// && merchantinventory.RemoveItem(item))
         {
+            merchantinventory.RemoveItem(item);
             playerinventory.AddItem(item);
             creds = hud.commonwealthcredits;
             commonwealthcreds.text = "Commonwealth Credits : " + creds;
         }
+    }
+
+    public void refresher()
+    {
+        playerinventory.RefreshUI();
     }
 }

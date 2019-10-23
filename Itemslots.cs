@@ -12,6 +12,7 @@ public class Itemslots : MonoBehaviour, IPointerClickHandler
     public event Action<Item> OnLeftClickEvent;
     public Item _item;
     public int goar;
+    public Text text;
 
 
 
@@ -24,13 +25,16 @@ public class Itemslots : MonoBehaviour, IPointerClickHandler
             _item = value;
             if (_item == null)
             {
-                image.enabled = false;
+                //image.enabled = false;
+                text.enabled = false;
 
             }
             else
             {
-                image.sprite = _item.icon;
-                image.enabled = true;
+                //image.sprite = _item.icon;
+                //image.enabled = true;
+                text.enabled = true;
+                text.text=Item.GameName;
             }
         }
     }

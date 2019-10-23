@@ -37,6 +37,13 @@ public class HUD : MonoBehaviour
 
     public float commonwealthcredits;
     public Text CommonwealthCredsText;
+    Rigidbody rb;
+    public GameObject rotator;
+    public GameObject animalmanager;
+    public GameObject weaponmanager;
+    public GameObject npcmanager;
+    public GameObject movementmanager;
+    public GameObject LookUpDown;
 
     // Start is called before the first frame update
     void Start()
@@ -51,6 +58,8 @@ public class HUD : MonoBehaviour
         experiencepoints = 0;
         experiencetext.text = "LV" + Level + ": " + experiencepoints + "/" + experiencecap[l];
         skillpoints = 0;
+        rb = player.GetComponent<Rigidbody>();
+        
     }
 
     // Update is called once per frame
@@ -141,16 +150,32 @@ public class HUD : MonoBehaviour
         
             if (ispaused == true)
             {
-                menupane.SetActive(false);
-                Cursor.visible = false;
-                ispaused = false;
+            menupane.SetActive(false);
+            Cursor.visible = false;
+            ispaused = false;
+            rotator.GetComponent<Rotator>().enabled = true;
+            animalmanager.SetActive(true);
+            weaponmanager.SetActive(true);
+            npcmanager.SetActive(true);
+            movementmanager.SetActive(true);
+            LookUpDown.GetComponent<LookUpDown>().enabled = true;
+            rb.WakeUp();
+            
             
             }
             else if (ispaused == false)
             {
-                menupane.SetActive(true);
-                Cursor.visible = true;
-                ispaused = true;
+            menupane.SetActive(true);
+            Cursor.visible = true;
+            rotator.GetComponent<Rotator>().enabled = false;
+            animalmanager.SetActive(false);
+            weaponmanager.SetActive(false);
+            npcmanager.SetActive(false);
+            movementmanager.SetActive(false);
+            LookUpDown.GetComponent<LookUpDown>().enabled = false;
+            rb.Sleep();
+            ispaused = true;
+            
             }
         
     }

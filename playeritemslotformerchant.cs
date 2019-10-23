@@ -16,6 +16,7 @@ public class playeritemslotformerchant : MonoBehaviour, IPointerClickHandler
     public int goar;
     public float playercurrency;
     public float creds;
+    public Text text;
     //have buybools that are set from inspector to set which merchant buys what, could modify prices too
 
 
@@ -29,13 +30,16 @@ public class playeritemslotformerchant : MonoBehaviour, IPointerClickHandler
             _item = value;
             if (_item == null)
             {
-                image.enabled = false;
+                //image.enabled = false;
+                text.enabled = false;
 
             }
             else
             {
-                image.sprite = _item.icon;
-                image.enabled = true;
+               // image.sprite = _item.icon;
+               // image.enabled = true;
+                text.enabled = true;
+                text.text = Item.GameName + " - " + Item.PlayerPrice;
             }
         }
     }

@@ -17,9 +17,19 @@ public class InteractAble : MonoBehaviour
     public GameObject merchantmenu;
     public bool MenuUp;
     
+
+    Rigidbody rb;
+    public GameObject rotator;
+    public GameObject animalmanager;
+    public GameObject weaponmanager;
+    public GameObject npcmanager;
+    public GameObject movementmanager;
+    public GameObject LookUpDown;
+
     // Start is called before the first frame update
     void Start()
     {
+        rb = player.GetComponent<Rigidbody>();
         if (itemtype == 1)
         {
             if (dooropen == true)
@@ -79,9 +89,26 @@ public class InteractAble : MonoBehaviour
     {
         if (MenuUp == false)
         {
+            rotator.GetComponent<Rotator>().enabled = false;
+            animalmanager.SetActive(false);
+            weaponmanager.SetActive(false);
+            npcmanager.SetActive(false);
+            movementmanager.SetActive(false);
+            LookUpDown.GetComponent<LookUpDown>().enabled = false;
+            rb.Sleep();
+            Cursor.visible = true;
+            merchantmenu.GetComponent<merchantmenuscript>().refresher();
             MenuGoesUp();
         }else if (MenuUp == true)
         {
+            rotator.GetComponent<Rotator>().enabled = true;
+            animalmanager.SetActive(true);
+            weaponmanager.SetActive(true);
+            npcmanager.SetActive(true);
+            movementmanager.SetActive(true);
+            LookUpDown.GetComponent<LookUpDown>().enabled = true;
+            rb.WakeUp();
+            Cursor.visible = false;
             MenuGoesDown();
         }
 

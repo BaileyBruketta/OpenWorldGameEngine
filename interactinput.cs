@@ -7,7 +7,8 @@ public class interactinput : MonoBehaviour
     // Start is called before the first frame update
     public GameObject[] interactable;
     public InteractAble[] objectofinteraction;
-   
+    
+
 
     void Start()
     {

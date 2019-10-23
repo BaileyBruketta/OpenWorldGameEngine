@@ -70,6 +70,8 @@ public class NpcScript : MonoBehaviour
     public float NewActionNumber;
     public float NewActionTimerStart;
     public float EnemyClassification;
+    //0=walking soldier
+    //3=civillian
     public Transform[] Location;
     
     public float locationxyzdif;
@@ -85,6 +87,7 @@ public class NpcScript : MonoBehaviour
     public bool walkionary;
     public float numberofwaypoints;
     public float walkstutter;
+    public float civvytimer;
 
 
     public void Start()
@@ -107,6 +110,7 @@ public class NpcScript : MonoBehaviour
         aggro = false;
         locale = 0;
         walkstutter = 2;
+        civvytimer = 30;
 
 
 
@@ -204,6 +208,7 @@ public class NpcScript : MonoBehaviour
     }
     public void CombatMovement()
     {
+
         speed = 600;
         maxvelocity = 80;
         int layerMask = (1 << 9) | (1 << 10) | (1 << 11);  //npc layer and npc hitbox layer
@@ -300,31 +305,44 @@ public class NpcScript : MonoBehaviour
     {
         //rotationscript.SetActive(false);
         Hoxie.UpdateBoxes();
-        if (aggro == true)
+        if (EnemyClassification == 0)
         {
-            if (seen == true)
+            if (aggro == true)
             {
-                if (isdead == false)
+                if (seen == true)
                 {
-                    LookAtThePlayer();
-                    VisionCheck();
-                    CombatMovement();
-                    //TakeShot();
+                    if (isdead == false)
+                    {
+                        LookAtThePlayer();
+                        VisionCheck();
+                        CombatMovement();
+                        //TakeShot();
+                    }
+                }
+                if (seen == false)
+                {
+                    if (isdead == false)
+                    {
+                        soundcheck();
+                        VisionCheck();
+                        RegularMovement();
+                    }
                 }
             }
-            if (seen == false)
+            if (aggro == false)
             {
-                if (isdead == false)
-                {
-                    soundcheck();
-                    VisionCheck();
-                    RegularMovement();
-                }
+                RegularMovement();
             }
         }
-        if (aggro == false)
+        if (EnemyClassification == 3)
         {
-            RegularMovement();
+            if (aggro == true)
+            {
+                if (isdead == false)
+                {
+
+                }
+            }
         }
 
         
@@ -512,5 +530,29 @@ public class NpcScript : MonoBehaviour
     public void Located()
     {
         //deprecated
+    }
+    public void CiviRun()
+    {
+        if (civvytimer == 28)
+        {
+            transform.eulerAngles = new Vector3(0, Random.Range(0, 40), 0);
+        }
+        civvytimer -= .2f;
+        speed = 600;
+        maxvelocity = 80;
+        rb.Sleep();
+        rb.WakeUp();
+        anim.SetBool("running", true);
+        anim.SetBool("Walking", false);
+        var v = rb.velocity;
+        rb.AddRelativeForce(Vector3.forward * speed);
+        rb.velocity = v.normalized * maxvelocity;
+            if (civvytimer < 2)
+        {
+            civvytimer = 30;
+        }
+
+
+
     }
 }

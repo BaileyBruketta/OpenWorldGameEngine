@@ -111,8 +111,7 @@ public class MovementManager : MonoBehaviour
 
         
 
-        if (grounded==true)
-        {
+        
             var v = rb.velocity;
             
             if (Input.GetKey(KeyCode.W))
@@ -168,7 +167,7 @@ public class MovementManager : MonoBehaviour
                     }
                 }
             }
-        }
+        
         manj.Updateus();
         
     }

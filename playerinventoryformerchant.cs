@@ -8,6 +8,7 @@ public class playerinventoryformerchant : MonoBehaviour
     [SerializeField] List<Item> items;
     [SerializeField] Transform itemsParent;
     [SerializeField] playeritemslotformerchant[] playeritemslotformerchant;
+    [SerializeField] Inventory inventory;
 
 
     public event Action<Item> OnItemLeftClickedEvent;
@@ -20,6 +21,10 @@ public class playerinventoryformerchant : MonoBehaviour
         for (int i = 0; i < playeritemslotformerchant.Length; i++)
         {
             playeritemslotformerchant[i].OnLeftClickEvent += OnItemLeftClickedEvent;
+        }
+        for (int i = 0; i < inventory.itemSlots.Length; i++)
+        {
+            AddItem(inventory.items[i]);
         }
 
         RefreshUI();
@@ -65,7 +70,7 @@ public class playerinventoryformerchant : MonoBehaviour
     }
 
     //refreshes and ties itemslots to items list
-    private void RefreshUI()
+    public void RefreshUI()
     {
         int i = 0;
 
@@ -77,6 +82,13 @@ public class playerinventoryformerchant : MonoBehaviour
         for (; i < playeritemslotformerchant.Length; i++)
         {
             playeritemslotformerchant[i].Item = null;
+        }
+        for (; i < inventory.itemSlots.Length; i++)
+        {
+            if (inventory.items[i] != null)
+            {
+                AddItem(inventory.items[i]);
+            }
         }
     }
 }
