@@ -126,7 +126,7 @@ public class AnimalScript : MonoBehaviour
 
         }
 
-        checktimer = 3;
+        checktimer = 2;
     }
     public void Scary()
     {

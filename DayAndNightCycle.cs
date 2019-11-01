@@ -68,7 +68,7 @@ public class DayAndNightCycle : MonoBehaviour
             {
                 sunlight.intensity = 2f;
                 moonie.intensity = 0;
-                RenderSettings.skybox.SetFloat("_Exposure", 2);
+                RenderSettings.skybox.SetFloat("_Exposure", 1);
             }
         }
         

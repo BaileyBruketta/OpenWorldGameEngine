@@ -220,13 +220,14 @@ public class NpcScript : MonoBehaviour
             rb.WakeUp();
             anim.SetBool("running", true);
             anim.SetBool("Walking", false);
+            anim.SetBool("aiming", false);
             var v = rb.velocity;
             rb.AddRelativeForce(Vector3.forward * speed);
             rb.velocity = v.normalized * maxvelocity;
             NewActionTimer = 40;
             
         }
-        if (xyzdif < 30)
+        if (xyzdif < 2)
         {
             anim.SetBool("running", false);
         }
@@ -284,6 +285,7 @@ public class NpcScript : MonoBehaviour
                 rb.Sleep();
                 rb.WakeUp();
                 Punch();
+                anim.SetBool("running", false);
                 anim.SetBool("Aiming", true);
                 var lookDir = player.position - transform.position;
                 lookDir.y = 0; // keep only the horizontal direction
@@ -299,7 +301,18 @@ public class NpcScript : MonoBehaviour
                 TakeShot();
 
             }
-        }   }
+            if (target == null)
+            {
+                if (aggro == true)
+                {
+                    if (seen == true)
+                    {
+                        CombatMovement();
+                    }
+                }
+            }
+        }
+    }
 
     public void GetTheUpdate() //called by outside npcmanager script
     {
@@ -315,7 +328,7 @@ public class NpcScript : MonoBehaviour
                     {
                         LookAtThePlayer();
                         VisionCheck();
-                        CombatMovement();
+                        
                         //TakeShot();
                     }
                 }

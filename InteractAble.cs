@@ -97,7 +97,7 @@ public class InteractAble : MonoBehaviour
             LookUpDown.GetComponent<LookUpDown>().enabled = false;
             rb.Sleep();
             Cursor.visible = true;
-            merchantmenu.GetComponent<merchantmenuscript>().refresher();
+            //merchantmenu.GetComponent<merchantmenuscript>().refresher();
             MenuGoesUp();
         }else if (MenuUp == true)
         {

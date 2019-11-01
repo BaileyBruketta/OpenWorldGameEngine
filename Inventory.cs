@@ -65,7 +65,7 @@ public class Inventory : MonoBehaviour
     }
 
     //refreshes and ties itemslots to items list
-    private void RefreshUI()
+    public void RefreshUI()
     {
         int i = 0;
 

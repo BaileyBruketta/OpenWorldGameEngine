@@ -48,7 +48,7 @@ public class MovementManager : MonoBehaviour
     {
         speed =100;
         jumptimer -= 1;
-        maxVelocity = 1;
+        maxVelocity = 2f;
         rb.WakeUp();
         //set speeds
 //        if (rb.velocity.magnitude < 5)
@@ -61,7 +61,7 @@ public class MovementManager : MonoBehaviour
         
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            speed = 500;
+            speed = 700;
         }
 
         if (Input.GetKeyDown(KeyCode.LeftControl))
@@ -71,7 +71,7 @@ public class MovementManager : MonoBehaviour
             if (iscrouching)
             {
                 iscrouching = false;
-                speed = 300;
+                speed = 500;
                 rb.AddRelativeForce(Vector3.up * 300);
                 col_size.height = 2.8f;
                 col_size.center = new Vector3(0, -2.520422f, 0);

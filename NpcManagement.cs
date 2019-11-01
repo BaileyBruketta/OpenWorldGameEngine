@@ -29,8 +29,10 @@ public class NpcManagement : MonoBehaviour
         for (int i = 0; i < NPCs.Length; i++)
         {
             nengpc[i]=NPCs[i].GetComponent<NpcScript>();
+            
         }
         x = 0;
+        
     }
     // Update is called once per frame
     public void Updateus()
@@ -83,8 +85,6 @@ public class NpcManagement : MonoBehaviour
             {
                 NPCs[i].SetActive(true);
             }
-
-            //NPCs[i].GetComponent<NpcScript>().GetTheUpdate();
         }
         timer2 = 10;
     }

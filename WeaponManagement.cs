@@ -156,7 +156,7 @@ public class WeaponManagement : MonoBehaviour
         }
         if (glocknineEquipped == true)
         {
-            glockninetimer -= 1;
+            glockninetimer -= 2;
         }
     }
     //for changing weapons on the fly
@@ -301,7 +301,7 @@ public class WeaponManagement : MonoBehaviour
     {
         if (VectorEquipped == true)
         {
-            maincam.fieldOfView = 108;
+            maincam.fieldOfView =25;
             Vector.GetComponent<Animator>().SetBool("ads", true);
             
         }
@@ -310,12 +310,12 @@ public class WeaponManagement : MonoBehaviour
             HuntingRifle.GetComponent<Animator>().SetBool("ads", true);
             scope.SetActive(true);
             scopebody.SetActive(false);
-            maincam.fieldOfView = 15;
+            maincam.fieldOfView = 5;
 
         }
         if (glocknineEquipped == true)
         {
-            maincam.fieldOfView = 108;
+            maincam.fieldOfView = 25;
             glocknine.GetComponent<Animator>().SetBool("ads", true);
         }
         hitmarker1.SetActive(false);
@@ -324,21 +324,21 @@ public class WeaponManagement : MonoBehaviour
     {
         if (VectorEquipped == true)
         {
-            maincam.fieldOfView = 110;
+            maincam.fieldOfView = 35;
             Vector.GetComponent<Animator>().SetBool("ads", false);
 
         }
         if (HuntingRifleEquipped == true)
         {
             HuntingRifle.GetComponent<Animator>().SetBool("ads", false);
-            maincam.fieldOfView = 110;
+            maincam.fieldOfView = 35;
             scope.SetActive(false);
             scopebody.SetActive(true);
 
         }
         if (glocknineEquipped == true)
         {
-            maincam.fieldOfView = 110;
+            maincam.fieldOfView = 35;
             glocknine.GetComponent<Animator>().SetBool("ads", false);
         }
         hitmarker1.SetActive(true);
