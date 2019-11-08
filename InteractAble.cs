@@ -16,7 +16,7 @@ public class InteractAble : MonoBehaviour
     public float xyzdif;
     public GameObject merchantmenu;
     public bool MenuUp;
-    
+    public GameObject initialmerchantmenu;
 
     Rigidbody rb;
     public GameObject rotator;
@@ -25,6 +25,7 @@ public class InteractAble : MonoBehaviour
     public GameObject npcmanager;
     public GameObject movementmanager;
     public GameObject LookUpDown;
+
 
     // Start is called before the first frame update
     void Start()
@@ -117,7 +118,7 @@ public class InteractAble : MonoBehaviour
         
     {
         MenuUp = true;
-        merchantmenu.SetActive(true);
+        initialmerchantmenu.SetActive(true);
     }
     public void MenuGoesDown()
     {
